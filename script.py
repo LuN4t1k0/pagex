@@ -141,10 +141,10 @@ def transform_data_to_dataframe(data):
     # Eliminar filas específicas de encabezados manualmente
     df = df[~df['RUT'].str.contains("Identificación del Trabajador|Fondo de Pensiones|Seguro Cesantía|Movimiento de Personal|Totales Generales", case=False, na=False)]
     
-    # Calcular la diferencia en días entre Fecha Inicio y Fecha Término
+    # Calcular la diferencia en días entre Fecha Inicio y Fecha Término, considerando el día de inicio
     df['Fecha Inicio'] = pd.to_datetime(df['Fecha Inicio'], errors='coerce', dayfirst=True)
     df['Fecha Término'] = pd.to_datetime(df['Fecha Término'], errors='coerce', dayfirst=True)
-    df['Días'] = (df['Fecha Término'] - df['Fecha Inicio']).dt.days
+    df['Días'] = (df['Fecha Término'] - df['Fecha Inicio']).dt.days + 1
     
     # Crear la columna 'Periodo' con el formato mes-año
     df['Periodo'] = df['Fecha Inicio'].dt.strftime('%m-%Y').fillna('')
