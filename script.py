@@ -1,5 +1,5 @@
 
-# # # TRABAJANDO: v8 campos calculados
+# # TRABAJANDO: v9 campos calculados 
 # import pdfplumber
 # import pandas as pd
 # import re
@@ -13,7 +13,7 @@
 # output_folder = "output"
 # combined_excel_path = "output/resultado_concatenado.xlsx"
 # json_path = "indicadores/indicadores.json"
-# required_columns = ['RUT', 'Apellido Paterno, Materno, Nombres', 'Remuneración', 'Cod.', 'Fecha Inicio', 'Fecha Término', 'AFP', 'Días', 'Rem_Días', 'Periodo', 'Porcentaje', 'Pensión', 'Comisión']
+# required_columns = ['RUT', 'Apellido Paterno, Materno, Nombres', 'Remuneración', 'Cod.', 'Fecha Inicio', 'Fecha Término', 'AFP', 'Días', 'Rem_Días', 'Periodo', 'Porcentaje', 'Pensión', 'Comisión', 'Total_AFP']
 
 # header_patterns = [
 #     r"^RUT$", r"Apellido Paterno,? Materno,? Nombres", r"Remuneración", r"Fecha Inicio", r"Fecha Término", r"Cod."
@@ -40,14 +40,14 @@
 #                 table = page.extract_table()
 #                 if table:
 #                     for row in table:
-#                         if row and len(row) >= len(required_columns) - 6 and not is_header_row(row):
+#                         if row and len(row) >= len(required_columns) - 7 and not is_header_row(row):
 #                             data.append([row[0], row[1], re.sub(r'[^0-9,]', '', row[2]).replace(',', '.'), row[12], row[13], row[14], afp_name])
 #     except Exception as e:
 #         print(f"Error al procesar {pdf_path}: {e}")
 #     return data
 
 # def transform_data_to_dataframe(data):
-#     df = pd.DataFrame(data, columns=required_columns[:-6])
+#     df = pd.DataFrame(data, columns=required_columns[:-7])
 #     df['Remuneración'] = pd.to_numeric(df['Remuneración'].str.replace(',', '.'), errors='coerce')
 #     df = df[~df['RUT'].str.contains("Identificación del Trabajador|Fondo de Pensiones|Seguro Cesantía|Movimiento de Personal|Totales Generales", case=False, na=False)]
     
@@ -88,6 +88,9 @@
 #     # Calcular la columna 'Comisión'
 #     df['Comisión'] = ((df['Porcentaje'] / 100) * df['Rem_Días']).fillna(0).round(0).astype(int)
     
+#     # Calcular la columna 'Total_AFP'
+#     df['Total_AFP'] = (df['Pensión'] + df['Comisión']).fillna(0).astype(int)
+    
 #     df['Fecha Inicio'] = df['Fecha Inicio'].dt.strftime('%d-%m-%Y').fillna('')
 #     df['Fecha Término'] = df['Fecha Término'].dt.strftime('%d-%m-%Y').fillna('')
     
@@ -118,7 +121,9 @@
 # if __name__ == "__main__":
 #     main()
 
-# TRABAJANDO: v9 campos calculados 
+
+# # TRABAJANDO: v8 campos calculados
+
 import pdfplumber
 import pandas as pd
 import re
@@ -132,7 +137,7 @@ input_folder = "upload"
 output_folder = "output"
 combined_excel_path = "output/resultado_concatenado.xlsx"
 json_path = "indicadores/indicadores.json"
-required_columns = ['RUT', 'Apellido Paterno, Materno, Nombres', 'Remuneración', 'Cod.', 'Fecha Inicio', 'Fecha Término', 'AFP', 'Días', 'Rem_Días', 'Periodo', 'Porcentaje', 'Pensión', 'Comisión', 'Total_AFP']
+required_columns = ['RUT', 'Apellido Paterno, Materno, Nombres', 'Remuneración', 'Cod.', 'Fecha Inicio', 'Fecha Término', 'AFP', 'Días', 'Rem_Días', 'Periodo', 'Porcentaje', 'Pensión', 'Comisión', 'Total_AFP', 'Análisis']
 
 header_patterns = [
     r"^RUT$", r"Apellido Paterno,? Materno,? Nombres", r"Remuneración", r"Fecha Inicio", r"Fecha Término", r"Cod."
@@ -159,14 +164,14 @@ def extract_data_from_pdf(pdf_path):
                 table = page.extract_table()
                 if table:
                     for row in table:
-                        if row and len(row) >= len(required_columns) - 7 and not is_header_row(row):
+                        if row and len(row) >= len(required_columns) - 8 and not is_header_row(row):
                             data.append([row[0], row[1], re.sub(r'[^0-9,]', '', row[2]).replace(',', '.'), row[12], row[13], row[14], afp_name])
     except Exception as e:
         print(f"Error al procesar {pdf_path}: {e}")
     return data
 
 def transform_data_to_dataframe(data):
-    df = pd.DataFrame(data, columns=required_columns[:-7])
+    df = pd.DataFrame(data, columns=required_columns[:-8])
     df['Remuneración'] = pd.to_numeric(df['Remuneración'].str.replace(',', '.'), errors='coerce')
     df = df[~df['RUT'].str.contains("Identificación del Trabajador|Fondo de Pensiones|Seguro Cesantía|Movimiento de Personal|Totales Generales", case=False, na=False)]
     
@@ -209,6 +214,9 @@ def transform_data_to_dataframe(data):
     
     # Calcular la columna 'Total_AFP'
     df['Total_AFP'] = (df['Pensión'] + df['Comisión']).fillna(0).astype(int)
+    
+    # Calcular la columna 'Análisis'
+    df['Análisis'] = df['Días'].apply(lambda x: 'CORRESPONDE' if pd.notna(x) and x <= 10 else 'NO CORRESPONDE')
     
     df['Fecha Inicio'] = df['Fecha Inicio'].dt.strftime('%d-%m-%Y').fillna('')
     df['Fecha Término'] = df['Fecha Término'].dt.strftime('%d-%m-%Y').fillna('')
