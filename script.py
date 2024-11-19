@@ -1128,33 +1128,69 @@ def transform_data_to_dataframe(data):
         if pd.notna(max_remuneracion):
             df.loc[(df['RUT'] == rut) & (df['Remuneración'] == 0), 'Remuneración'] = max_remuneracion
     
-    # Implement the new logic for 'Rem_Días'
-    df['Rem_Días'] = 0.0  # Initialize the column as float
+    # # Implement the new logic for 'Rem_Días'
+    # df['Rem_Días'] = 0.0  # Initialize the column as float
     
-    # Condition: Días <= 11
+    # # Condition: Días <= 11
+    # cond1 = df['Días'] <= 11
+    
+    # # Subcondition 1a: Tipo_Renta == 'Renta Tope'
+    # cond1a = cond1 & (df['Tipo_Renta'] == 'Renta Tope')
+    # df.loc[cond1a, 'Rem_Días'] = (df.loc[cond1a, 'Remuneración'] / 30) * df.loc[cond1a, 'Días']
+    
+    # # Subcondition 1b: Tipo_Renta != 'Renta Tope'
+    # cond1b = cond1 & (df['Tipo_Renta'] != 'Renta Tope')
+    # df.loc[cond1b, 'Rem_Días'] = (df.loc[cond1b, 'Remuneración'] / 30) * 3
+    
+    # # Condition: Días > 11
+    # cond2 = df['Días'] > 11
+    
+    # # Subcondition 2a: Días is 29, 30, or 31
+    # cond2a = cond2 & df['Días'].isin([29, 30, 31])
+    # df.loc[cond2a, 'Rem_Días'] = (df.loc[cond2a, 'Remuneración'] / 30) * df.loc[cond2a, 'Días']
+    
+    # # Subcondition 2b: Días not 29, 30, or 31
+    # cond2b = cond2 & ~df['Días'].isin([29, 30, 31])
+    # df.loc[cond2b, 'Rem_Días'] = 0.0
+    
+    # # Finalize 'Rem_Días' calculation
+    # df['Rem_Días'] = df['Rem_Días'].fillna(0).round(0).astype(int)
+
+    # Inicializar 'Rem_Días' como float
+    df['Rem_Días'] = 0.0
+
+# Condición: Días <= 11
     cond1 = df['Días'] <= 11
-    
-    # Subcondition 1a: Tipo_Renta == 'Renta Tope'
+
+# Subcondición 1a: Tipo_Renta == 'Renta Tope'
     cond1a = cond1 & (df['Tipo_Renta'] == 'Renta Tope')
     df.loc[cond1a, 'Rem_Días'] = (df.loc[cond1a, 'Remuneración'] / 30) * df.loc[cond1a, 'Días']
-    
-    # Subcondition 1b: Tipo_Renta != 'Renta Tope'
+
+# Subcondición 1b: Tipo_Renta != 'Renta Tope'
     cond1b = cond1 & (df['Tipo_Renta'] != 'Renta Tope')
-    df.loc[cond1b, 'Rem_Días'] = (df.loc[cond1b, 'Remuneración'] / 30) * 3
-    
-    # Condition: Días > 11
+
+# Subcondición 1b1: Días <= 3
+    cond1b1 = cond1b & (df['Días'] <= 3)
+    df.loc[cond1b1, 'Rem_Días'] = (df.loc[cond1b1, 'Remuneración'] / 30) * df.loc[cond1b1, 'Días']
+
+# Subcondición 1b2: Días > 3
+    cond1b2 = cond1b & (df['Días'] > 3)
+    df.loc[cond1b2, 'Rem_Días'] = (df.loc[cond1b2, 'Remuneración'] / 30) * 3
+
+# Condición: Días > 11
     cond2 = df['Días'] > 11
-    
-    # Subcondition 2a: Días is 29, 30, or 31
+
+# Subcondición 2a: Días es 29, 30 o 31
     cond2a = cond2 & df['Días'].isin([29, 30, 31])
     df.loc[cond2a, 'Rem_Días'] = (df.loc[cond2a, 'Remuneración'] / 30) * df.loc[cond2a, 'Días']
-    
-    # Subcondition 2b: Días not 29, 30, or 31
+
+# Subcondición 2b: Días no es 29, 30 o 31
     cond2b = cond2 & ~df['Días'].isin([29, 30, 31])
     df.loc[cond2b, 'Rem_Días'] = 0.0
-    
-    # Finalize 'Rem_Días' calculation
+
+# Finalizar el cálculo de 'Rem_Días'
     df['Rem_Días'] = df['Rem_Días'].fillna(0).round(0).astype(int)
+
     
     # Calculate 'Pensión' column
     df['Pensión'] = (df['Rem_Días'] * 0.10).fillna(0).round(0).astype(int)
