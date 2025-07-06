@@ -6,3 +6,4 @@ openpyxl
 numpy
 python-multipart
 tqdm
+python-dotenv

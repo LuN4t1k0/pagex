@@ -6171,3 +6171,62 @@
 2025-07-05 20:31:25,440 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
 2025-07-05 20:31:25,440 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
 2025-07-05 20:31:25,441 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:45,888 - INFO - AFP encontrada en /var/folders/53/_4wjbdcd79lbly3n7twqrrd80000gn/T/tmp5vaw0qp_/pdfs/35.2024-10.pdf: UNO
+2025-07-05 20:47:46,168 - ERROR - Error al procesar /var/folders/53/_4wjbdcd79lbly3n7twqrrd80000gn/T/tmp5vaw0qp_/pdfs/35.2024-10.pdf: 'NoneType' object has no attribute 'strip'
+2025-07-05 20:47:46,179 - INFO - JSON de indicadores cargado correctamente desde indicadores/indicadores.json.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,180 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,181 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,182 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,296 - INFO - AFP encontrada en /var/folders/53/_4wjbdcd79lbly3n7twqrrd80000gn/T/tmp5vaw0qp_/pdfs/34.2024-10.pdf: Modelo
+2025-07-05 20:47:46,813 - ERROR - Error al procesar /var/folders/53/_4wjbdcd79lbly3n7twqrrd80000gn/T/tmp5vaw0qp_/pdfs/34.2024-10.pdf: 'NoneType' object has no attribute 'strip'
+2025-07-05 20:47:46,819 - INFO - JSON de indicadores cargado correctamente desde indicadores/indicadores.json.
+2025-07-05 20:47:46,820 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,820 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,820 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,820 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,820 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,821 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,822 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,823 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,824 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,824 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,824 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,824 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
+2025-07-05 20:47:46,824 - WARNING - Registro con 'Periodo' vacío. Asignando tasa por defecto.
