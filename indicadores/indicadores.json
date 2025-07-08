@@ -11074,5 +11074,1325 @@
       "utm": ["$ 66.561"],
       "valor": ["Octubre 2024"]
     }
+  },
+  "202411": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "12,94%",
+        "12,94%",
+        "12,77%",
+        "12,66%",
+        "12,95%",
+        "12,08%",
+        "11,99%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.912.396", "$ 22.948.752"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 586.227",
+        "Renta > $ 586.227 < = $ 856.247",
+        "Renta > $ 856.247 < = $ 1.335.450",
+        "Renta > $ 1.335.450"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 34.423.128"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,4% R.I.", "1,6% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 35.979,12",
+        "$ 115.932,72",
+        "$ 299.159,72",
+        "$ 742.235,92",
+        "$ 1.185.978,40",
+        "$ 1.553.764,96",
+        "$ 2.586.498,96"
+      ],
+      "desde": [
+        "-",
+        "$ 899.478,01",
+        "$ 1.998.840,01",
+        "$ 3.331.400,01",
+        "$ 4.663.960,01",
+        "$ 5.996.520,01",
+        "$ 7.995.360,01",
+        "$ 20.654.680,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 899.478,00",
+        "$ 1.998.840,00",
+        "$ 3.331.400,00",
+        "$ 4.663.960,00",
+        "$ 5.996.520,00",
+        "$ 7.995.360,00",
+        "$ 20.654.680,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 500.000", "$ 372.989", "$ 500.000", "$ 322.295"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (84,3 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (126,6 UF)"
+      ],
+      "valor": ["$ 3.224.300", "$ 2.278.285", "$ 4.842.187"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 30 de Noviembre del 2024", "Al 31 de Octubre del 2024"],
+      "UF": ["$ 38.247,92", "$ 37.971,42"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 799.536"],
+      "utm": ["$ 66.628"],
+      "valor": ["Noviembre 2024"]
+    }
+  },
+  "202412": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%",
+        "1,5%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "12,94%",
+        "12,94%",
+        "12,77%",
+        "12,66%",
+        "12,95%",
+        "12,08%",
+        "11,99%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.920.835", "$ 23.050.014"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 586.227",
+        "Renta > $ 586.227 < = $ 856.247",
+        "Renta > $ 856.247 < = $ 1.335.450",
+        "Renta > $ 1.335.450"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 34.575.021"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,4% R.I.", "1,6% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 36.338,76",
+        "$ 117.091,56",
+        "$ 302.150,06",
+        "$ 749.655,16",
+        "$ 1.197.833,20",
+        "$ 1.569.296,08",
+        "$ 2.612.353,08"
+      ],
+      "desde": [
+        "-",
+        "$ 908.469,01",
+        "$ 2.018.820,01",
+        "$ 3.364.700,01",
+        "$ 4.710.580,01",
+        "$ 6.056.460,01",
+        "$ 8.075.280,01",
+        "$ 20.861.140,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 908.469,00",
+        "$ 2.018.820,00",
+        "$ 3.364.700,00",
+        "$ 4.710.580,00",
+        "$ 6.056.460,00",
+        "$ 8.075.280,00",
+        "$ 20.861.140,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 500.000", "$ 372.989", "$ 500.000", "$ 322.295"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (84,3 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (126,6 UF)"
+      ],
+      "valor": ["$ 3.238.527", "$ 2.294.875", "$ 4.863.553"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 31 de Diciembre del 2024", "Al 30 de Noviembre del 2024"],
+      "UF": ["$ 38.416,69", "$ 38.247,92"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 807.528"],
+      "utm": ["$ 67.294"],
+      "valor": ["Diciembre 2024"]
+    }
+  },
+  "202501": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "12,82%",
+        "12,82%",
+        "12,65%",
+        "12,54%",
+        "12,83%",
+        "11,96%",
+        "11,87%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.919.221", "$ 23.030.646"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 598.698",
+        "Renta > $ 598.698 < = $ 874.460",
+        "Renta > $ 874.460 < = $ 1.363.858",
+        "Renta > $ 1.363.858"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 34.545.969"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["3,1% R.I.", "3,9% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 36.411,66",
+        "$ 117.326,46",
+        "$ 302.756,21",
+        "$ 751.159,06",
+        "$ 1.200.236,20",
+        "$ 1.572.444,28",
+        "$ 2.617.593,78"
+      ],
+      "desde": [
+        "-",
+        "$ 910.291,51",
+        "$ 2.022.870,01",
+        "$ 3.371.450,01",
+        "$ 4.720.030,01",
+        "$ 6.068.610,01",
+        "$ 8.091.480,01",
+        "$ 20.902.990,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 910.291,50",
+        "$ 2.022.870,00",
+        "$ 3.371.450,00",
+        "$ 4.720.030,00",
+        "$ 6.068.610,00",
+        "$ 8.091.480,00",
+        "$ 20.902.990,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 510.636", "$ 380.923", "$ 510.636", "$ 329.151"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,8 UF)"
+      ],
+      "valor": ["$ 3.370.151", "$ 2.305.001", "$ 5.059.065"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 31 de Enero del 2025", "Al 31 de Diciembre del 2024"],
+      "UF": ["$ 38.384,41", "$ 38.416,69"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 809.148"],
+      "utm": ["$ 67.429"],
+      "valor": ["Enero 2025"]
+    }
+  },
+  "202502": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "12,82%",
+        "12,82%",
+        "12,65%",
+        "12,54%",
+        "12,83%",
+        "11,96%",
+        "11,87%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.932.397", "$ 23.188.764"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 598.698",
+        "Renta > $ 598.698 < = $ 874.460",
+        "Renta > $ 874.460 < = $ 1.363.858",
+        "Renta > $ 1.363.858"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 34.783.146"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,2% R.I.", "1,8% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 36.338,76",
+        "$ 117.091,56",
+        "$ 302.150,06",
+        "$ 749.655,16",
+        "$ 1.197.833,20",
+        "$ 1.569.296,08",
+        "$ 2.612.353,08"
+      ],
+      "desde": [
+        "-",
+        "$ 908.469,01",
+        "$ 2.018.820,01",
+        "$ 3.364.700,01",
+        "$ 4.710.580,01",
+        "$ 6.056.460,01",
+        "$ 8.075.280,01",
+        "$ 20.861.140,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 908.469,00",
+        "$ 2.018.820,00",
+        "$ 3.364.700,00",
+        "$ 4.710.580,00",
+        "$ 6.056.460,00",
+        "$ 8.075.280,00",
+        "$ 20.861.140,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 510.636", "$ 380.923", "$ 510.636", "$ 329.151"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,9 UF)"
+      ],
+      "valor": ["$ 3.393.289", "$ 2.303.065", "$ 5.097.663"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 28 de Febrero del 2025", "Al 31 de Enero del 2025"],
+      "UF": ["$ 38.647,94", "$ 38.384,41"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 807.528"],
+      "utm": ["$ 67.294"],
+      "valor": ["Febrero 2025"]
+    }
+  },
+  "202503": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%",
+        "1,38%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "12,82%",
+        "12,82%",
+        "12,65%",
+        "12,54%",
+        "12,83%",
+        "11,96%",
+        "11,87%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.944.706", "$ 23.336.466"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 598.698",
+        "Renta > $ 598.698 < = $ 874.460",
+        "Renta > $ 874.460 < = $ 1.363.858",
+        "Renta > $ 1.363.858"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 35.004.699"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,2% R.I.", "1,8% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 36.738,36",
+        "$ 118.379,16",
+        "$ 305.472,66",
+        "$ 757.898,76",
+        "$ 1.211.005,20",
+        "$ 1.586.552,88",
+        "$ 2.641.079,88"
+      ],
+      "desde": [
+        "-",
+        "$ 918.459,01",
+        "$ 2.041.020,01",
+        "$ 3.401.700,01",
+        "$ 4.762.380,01",
+        "$ 6.123.060,01",
+        "$ 8.164.080,01",
+        "$ 21.090.540,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 918.459,00",
+        "$ 2.041.020,00",
+        "$ 3.401.700,00",
+        "$ 4.762.380,00",
+        "$ 6.123.060,00",
+        "$ 8.164.080,00",
+        "$ 21.090.540,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 510.636", "$ 380.923", "$ 510.636", "$ 329.151"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,9 UF)"
+      ],
+      "valor": ["$ 3.414.903", "$ 2.318.876", "$ 5.130.133"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 31 de Marzo del 2025", "Al 28 de Febrero del 2025"],
+      "UF": ["$ 38.894,11", "$ 38.647,94"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 816.408"],
+      "utm": ["$ 68.034"],
+      "valor": ["Marzo 2025"]
+    }
+  },
+  "202504": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "13,22%",
+        "13,22%",
+        "13,05%",
+        "12,94%",
+        "13,23%",
+        "12,36%",
+        "12,27%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.953.771", "$ 23.445.246"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 598.698",
+        "Renta > $ 598.698 < = $ 874.460",
+        "Renta > $ 874.460 < = $ 1.363.858",
+        "Renta > $ 1.363.858"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 35.167.869"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,2% R.I.", "1,8% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 36.885,24",
+        "$ 118.852,44",
+        "$ 306.693,94",
+        "$ 760.928,84",
+        "$ 1.215.846,80",
+        "$ 1.592.895,92",
+        "$ 2.651.638,92"
+      ],
+      "desde": [
+        "-",
+        "$ 922.131,01",
+        "$ 2.049.180,01",
+        "$ 3.415.300,01",
+        "$ 4.781.420,01",
+        "$ 6.147.540,01",
+        "$ 8.196.720,01",
+        "$ 21.174.860,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 922.131,00",
+        "$ 2.049.180,00",
+        "$ 3.415.300,00",
+        "$ 4.781.420,00",
+        "$ 6.147.540,00",
+        "$ 8.196.720,00",
+        "$ 21.174.860,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 510.636", "$ 380.923", "$ 510.636", "$ 329.151"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,9 UF)"
+      ],
+      "valor": ["$ 3.430.821", "$ 2.333.647", "$ 5.154.047"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 30 de Abril del 2025", "Al 31 de Marzo del 2025"],
+      "UF": ["$ 39.075,41", "$ 38.894,11"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 819.672"],
+      "utm": ["$ 68.306"],
+      "valor": ["Abril 2025"]
+    }
+  },
+  "202505": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "13,22%",
+        "13,22%",
+        "13,05%",
+        "12,94%",
+        "13,23%",
+        "12,36%",
+        "12,27%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.959.473", "$ 23.513.670"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 21.243", "$ 13.036", "$ 4.119", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 598.698",
+        "Renta > $ 598.698 < = $ 874.460",
+        "Renta > $ 874.460 < = $ 1.363.858",
+        "Renta > $ 1.363.858"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 35.270.505"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,2% R.I.", "1,8% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 37.069,92",
+        "$ 119.447,52",
+        "$ 308.229,52",
+        "$ 764.738,72",
+        "$ 1.221.934,40",
+        "$ 1.600.871,36",
+        "$ 2.664.915,36"
+      ],
+      "desde": [
+        "-",
+        "$ 926.748,01",
+        "$ 2.059.440,01",
+        "$ 3.432.400,01",
+        "$ 4.805.360,01",
+        "$ 6.178.320,01",
+        "$ 8.237.760,01",
+        "$ 21.280.880,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 926.748,00",
+        "$ 2.059.440,00",
+        "$ 3.432.400,00",
+        "$ 4.805.360,00",
+        "$ 6.178.320,00",
+        "$ 8.237.760,00",
+        "$ 21.280.880,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 510.636", "$ 380.923", "$ 510.636", "$ 329.151"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,9 UF)"
+      ],
+      "valor": ["$ 3.440.834", "$ 2.344.525", "$ 5.169.088"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 31 de Mayo del 2025", "Al 30 de Abril del 2025"],
+      "UF": ["$ 39.189,45", "$ 39.075,41"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 823.776"],
+      "utm": ["$ 68.648"],
+      "valor": ["Mayo 2025"]
+    }
+  },
+  "202506": {
+    "afp": {
+      "SIS_dependientes": [
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%",
+        "1,78%"
+      ],
+      "afp": [
+        "Capital",
+        "Cuprum",
+        "Habitat",
+        "PlanVital",
+        "ProVida",
+        "Modelo",
+        "Uno"
+      ],
+      "tasa_afp_dependientes": [
+        "11,44%",
+        "11,44%",
+        "11,27%",
+        "11,16%",
+        "11,45%",
+        "10,58%",
+        "10,49%"
+      ],
+      "tasa_afp_independientes": [
+        "13,22%",
+        "13,22%",
+        "13,05%",
+        "12,94%",
+        "13,23%",
+        "12,36%",
+        "12,27%"
+      ]
+    },
+    "ahorro_previsional_voluntario": {
+      "tipo_tope": ["Tope Mensual (50 UF)", "Tope Anual (600 UF)"],
+      "valor": ["$ 1.963.354", "$ 23.560.242"]
+    },
+    "asignacion_familiar": {
+      "monto": ["$ 22.007", "$ 13.505", "$ 4.267", "$ 0"],
+      "requisito_de_renta": [
+        "Renta < \u00f3 = $ 620.251",
+        "Renta > $ 620.251 < = $ 905.941",
+        "Renta > $ 905.941 < = $ 1.412.957",
+        "Renta > $ 1.412.957"
+      ],
+      "tramo": ["A", "B", "C", "D"]
+    },
+    "cotizacion_trabajos_pesados": {
+      "calificaci\u00f3n": ["4%", "2%"],
+      "financiamiento_empleador": ["2% R.I.", "1% R.I."],
+      "financiamiento_trabajador": ["2% R.I.", "1% R.I."],
+      "puesto_de_trabajo": ["Trabajo pesado", "Trabajo menos pesado"]
+    },
+    "deposito_convenido": {
+      "tipo_tope": ["Tope Anual (900 UF)"],
+      "valor": ["$ 35.340.363"]
+    },
+    "distribucion_7_porciento": {
+      "destino": ["CCAF", "FONASA"],
+      "porcentaje": ["5,2% R.I.", "1,8% R.I."]
+    },
+    "impuestosegundacatsii": {
+      "cantidad_a_rebajar": [
+        "-",
+        "$ 37.143,90",
+        "$ 119.685,90",
+        "$ 308.844,65",
+        "$ 766.264,90",
+        "$ 1.224.373,00",
+        "$ 1.604.066,20",
+        "$ 2.670.233,70"
+      ],
+      "desde": [
+        "-",
+        "$ 928.597,51",
+        "$ 2.063.550,01",
+        "$ 3.439.250,01",
+        "$ 4.814.950,01",
+        "$ 6.190.650,01",
+        "$ 8.254.200,01",
+        "$ 21.323.350,01"
+      ],
+      "factor": [
+        "Exento",
+        "0,04",
+        "0,08",
+        "0,135",
+        "0,23",
+        "0,304",
+        "0,35",
+        "0,4"
+      ],
+      "hasta": [
+        "$ 928.597,50",
+        "$ 2.063.550,00",
+        "$ 3.439.250,00",
+        "$ 4.814.950,00",
+        "$ 6.190.650,00",
+        "$ 8.254.200,00",
+        "$ 21.323.350,00",
+        "Y m\u00e1s"
+      ],
+      "tasa_de_impuesto_efectiva_maxima": [
+        "Exento",
+        "2,20%",
+        "4,52%",
+        "7,09%",
+        "10,62%",
+        "15,57%",
+        "27,48%",
+        "M\u00e1s de 27,48%"
+      ]
+    },
+    "mutual_sanna": {
+      "porcentaje": ["0,90%", "0,03%"],
+      "tipo": ["Mutual Cotizaci\u00f3n B\u00e1sica y Extraordinaria", "SANNA"]
+    },
+    "rentas_minimas_imponibles": {
+      "grupo": [
+        "Trab. Dependientes e Independientes",
+        "Menores de 18 y Mayores de 65",
+        "Trabajadores de Casa Particular",
+        "Para fines no remuneracionales"
+      ],
+      "valor": ["$ 529.000", "$ 394.622", "$ 529.000", "$ 340.988"]
+    },
+    "rentas_topes_imponibles": {
+      "grupo": [
+        "Para afiliados a una AFP (87,8 UF)",
+        "Para afiliados al IPS (ex INP) (60 UF)",
+        "Para Seguro de Cesant\u00eda (131,9 UF)"
+      ],
+      "valor": ["$ 3.447.649", "$ 2.351.367", "$ 5.179.327"]
+    },
+    "seguro_de_cesantia": {
+      "contrato": [
+        "Plazo Indefinido",
+        "Plazo Fijo",
+        "Plazo Indefinido 11 a\u00f1os o m\u00e1s ",
+        "Trabajador de Casa Particular "
+      ],
+      "financiamiento_trabajador": ["0,6% R.I.", "\u2013", "\u2013", "\u2013"],
+      "financiemiento_empleador": [
+        "2,4% R.I.",
+        "3,0% R.I.",
+        "0,8% R.I.",
+        "3,0% R.I."
+      ]
+    },
+    "valor_uf": {
+      "Fecha": ["Al 30 de Junio del 2025", "Al 31 de Mayo del 2025"],
+      "UF": ["$ 39.267,07", "$ 39.189,45"]
+    },
+    "valor_utm_uta": {
+      "uta": ["$ 825.420"],
+      "utm": ["$ 68.785"],
+      "valor": ["Junio 2025"]
+    }
   }
 }
