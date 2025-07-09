@@ -1,23 +1,67 @@
-# Entorno virtual
+# Entornos virtuales
 venv/
-.env
+.venv/
+env/
+.env/
+env.bak/
+venv.bak/
 
-# Archivos temporales
+# Archivos de caché y compilados de Python
 __pycache__/
-*.py[cod]
-*.log
-*.zip
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Archivos de salida
-output/
-upload/
-*.xlsx
+# Archivos de configuración local y secretos
+.env
+.env.*.local
+*.db
+*.sqlite3
 
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
+ehthumbs.db
 
-# Archivos de compilación
-*.so
+# Archivos de IDE y editores de código
+.idea/
+.vscode/
+*.swp
+*~
+*.sublime-workspace
+*.sublime-project
 
-*.DS_Store
+# Archivos de testing y cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# Archivos de logs
+*.log
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints
+
+# Archivos de dependencias de Poetry
+poetry.lock
