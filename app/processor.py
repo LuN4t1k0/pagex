@@ -110,6 +110,7 @@
 
 
 # NUEVO:
+
 import os
 import json
 import shutil
@@ -118,7 +119,7 @@ from datetime import datetime
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from dotenv import load_dotenv
 
-from script import extrae_tablas, procesa_dataframe  # funciones del core
+from script import extrae_tablas, procesa_dataframe
 
 # ------------------- CARGA VARIABLES -------------------
 load_dotenv()
@@ -126,7 +127,7 @@ SUMMARY_FILENAME = "resumen_corresponde.xlsx"
 DEBUG = os.getenv("DEBUG", "false").lower() == "true"
 LOG_TO_FILE = os.getenv("LOG_TO_FILE", "false").lower() == "true"
 
-log_file_lines = []  # Almacena logs para archivo si LOG_TO_FILE está activado
+log_file_lines = []
 
 def log_debug(msg):
     msg_full = f"[DEBUG] {msg}"
@@ -157,6 +158,12 @@ def procesar_archivos_desde_entrada(
         all_data: list[pd.DataFrame] = []
         detalles_global: dict[tuple, list] = {}
 
+        expected_cols = [
+            "RUT", "Nombre completo", "Remuneración", "Cod.", "Periodo", "Fecha Inicio",
+            "Fecha Término", "AFP", "Días", "Días_pagados", "Tipo_Renta", "Rem_Días",
+            "Pensión", "Comisión", "Total_AFP"
+        ]
+
         for file in files:
             filename = file.filename
             temp_pdf_path = os.path.join(pdf_dir, filename)
@@ -178,26 +185,25 @@ def procesar_archivos_desde_entrada(
                 log_debug("  ❌ Sin registros válidos después del procesamiento.")
                 continue
 
+            # Forzar columnas mínimas
+            for col in expected_cols:
+                if col not in df_res.columns:
+                    df_res[col] = pd.NA
+
             log_debug(f"  ✅ Registros válidos detectados: {len(df_res)}")
             all_data.append(df_res)
 
             for k, v in det_pdf.items():
                 detalles_global.setdefault(k, []).extend(v)
 
+        all_data = [df for df in all_data if not df.empty]
+
         if not all_data:
             raise ValueError("Todos los archivos fueron inválidos o vacíos.")
 
         combined_df = pd.concat(all_data, ignore_index=True)
 
-        expected_cols = [
-            "RUT", "Nombre completo", "Remuneración", "Cod.", "Periodo", "Fecha Inicio",
-            "Fecha Término", "AFP", "Días", "Días_pagados", "Tipo_Renta", "Rem_Días",
-            "Pensión", "Comisión", "Total_AFP"
-        ]
-        for col in expected_cols:
-            if col not in combined_df.columns:
-                combined_df[col] = pd.NA
-
+        # Asegurar dtypes
         numeric_cols = [
             "Remuneración", "Cod.", "Días", "Días_pagados",
             "Rem_Días", "Pensión", "Comisión", "Total_AFP"
@@ -224,11 +230,8 @@ def procesar_archivos_desde_entrada(
 
         for afp, grp in resumen_df.groupby("AFP"):
             safe = afp.replace(" ", "_")
-            grp.to_excel(
-                os.path.join(result_dir, f"AFP_{safe}.xlsx"), index=False
-            )
+            grp.to_excel(os.path.join(result_dir, f"AFP_{safe}.xlsx"), index=False)
 
-        # ---------- Guardar log a archivo si está activo ----------
         if LOG_TO_FILE and log_file_lines:
             log_path = os.path.join(result_dir, "debug.log")
             with open(log_path, "w", encoding="utf-8") as f:
