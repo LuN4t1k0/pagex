@@ -1,0 +1,90 @@
+# ============================================
+# Reglas para el cálculo de pago en exceso
+# ============================================
+# 1. Si el trabajador tiene 'Renta Tope' => se paga la totalidad de la licencia (Rem_Días = todos los días)
+# 2. Si NO tiene renta tope y la licencia dura ≤ 10 días:
+#    - Se pagan hasta 3 días como máximo.
+#    - Si la licencia cruza de mes, solo se pagan hasta 3 días del primer mes.
+# 3. Si en un mismo mes un trabajador (sin renta tope) acumula más de 10 días en múltiples licencias
+#    individuales (todas ≤ 10 días), entonces no se paga ninguna (Rem_Días = 0).
+# ============================================
+
+
++import calendar  # Asegúrate de tenerlo importado para calcular fin de mes
+
+ # Inicializar Rem_Días
+ df['Rem_Días'] = 0.0
+
+-# Condición: Días <= 10
+-cond1 = df['Días'] <= 10
+-
+-# Subcondición 1a: Tipo_Renta == 'Renta Tope'
+-cond1a = cond1 & (df['Tipo_Renta'] == 'Renta Tope')
+-df.loc[cond1a, 'Rem_Días'] = (df.loc[cond1a, 'Remuneración'] / 30) * df.loc[cond1a, 'Días']
+-
+-# Subcondición 1b: Tipo_Renta != 'Renta Tope'
+-cond1b = cond1 & (df['Tipo_Renta'] != 'Renta Tope')
+-
+-# Subcondición 1b1: Días <= 3
+-cond1b1 = cond1b & (df['Días'] <= 3)
+-df.loc[cond1b1, 'Rem_Días'] = (df.loc[cond1b1, 'Remuneración'] / 30) * df.loc[cond1b1, 'Días']
+-
+-# Subcondición 1b2: Días > 3
+-cond1b2 = cond1b & (df['Días'] > 3)
+-df.loc[cond1b2, 'Rem_Días'] = (df.loc[cond1b2, 'Remuneración'] / 30) * 3
+-
+-# Condición: Días > 11
+-cond2 = df['Días'] > 11
+-
+-# Subcondición 2a: Días es 29, 30 o 31
+-cond2a = cond2 & df['Días'].isin([29, 30, 31])
+-df.loc[cond2a, 'Rem_Días'] = (df.loc[cond2a, 'Remuneración'] / 30) * df.loc[cond2a, 'Días']
+-
+-# Subcondición 2b: Días no es 29, 30 o 31
+-cond2b = cond2 & ~df['Días'].isin([29, 30, 31])
+-df.loc[cond2b, 'Rem_Días'] = 0.0
+
++# === REGLA 4 ===
++for index, row in df.iterrows():
++    dias_licencia = row['Días']
++    tipo_renta = row['Tipo_Renta']
++    fecha_inicio = pd.to_datetime(row['Fecha Inicio'], errors='coerce', dayfirst=True)
++    fecha_termino = pd.to_datetime(row['Fecha Término'], errors='coerce', dayfirst=True)
++    remuneracion = row['Remuneración']
++
++    rem_dias = 0.0
++
++    if pd.notna(fecha_inicio) and pd.notna(fecha_termino):
++        cruza_mes = (fecha_inicio.month != fecha_termino.month) or (fecha_inicio.year != fecha_termino.year)
++
++        if tipo_renta == 'Renta Tope':
++            rem_dias = (remuneracion / 30) * dias_licencia
++        elif dias_licencia <= 10:
++            if cruza_mes:
++                ultimo_dia_mes = calendar.monthrange(fecha_inicio.year, fecha_inicio.month)[1]
++                fecha_fin_mes = pd.Timestamp(fecha_inicio.year, fecha_inicio.month, ultimo_dia_mes)
++                dias_en_primer_mes = (fecha_fin_mes - fecha_inicio).days + 1
++                dias_a_pagar = min(dias_en_primer_mes, 3)
++            else:
++                dias_a_pagar = min(dias_licencia, 3)
++            rem_dias = (remuneracion / 30) * dias_a_pagar
++
++    df.at[index, 'Rem_Días'] = rem_dias
++
++# === REGLA 3 ===
++grupo_evaluado = df[
++    (df['Tipo_Renta'] != 'Renta Tope') &
++    (df['Días'] <= 10)
++].groupby(['RUT', 'Periodo'])
++
++grupos_exceso = grupo_evaluado['Días'].sum()
++grupos_exceso = grupos_exceso[grupos_exceso > 10]
++
++for (rut, periodo), total_dias in grupos_exceso.items():
++    df.loc[
++        (df['RUT'] == rut) &
++        (df['Periodo'] == periodo) &
++        (df['Tipo_Renta'] != 'Renta Tope') &
++        (df['Días'] <= 10),
++        'Rem_Días'
++    ] = 0
