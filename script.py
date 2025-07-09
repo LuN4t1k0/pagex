@@ -8,7 +8,7 @@ from tqdm import tqdm
 # --------------------------------------------------
 input_folder  = "upload"
 output_folder = "output"
-combined_excel_path = os.path.join(output_folder, "resultado_concatenado.xlsx")
+# combined_excel_path = os.path.join(output_folder, "resultado_concatenado.xlsx")
 summary_excel_path  = os.path.join(output_folder, "resumen_corresponde.xlsx")
 json_path     = "indicadores/indicadores.json"
 
