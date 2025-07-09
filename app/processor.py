@@ -83,7 +83,6 @@ SUMMARY_FILENAME = "resumen_corresponde.xlsx"
 def procesar_archivos_desde_entrada(files, indicadores_path: str = None) -> tuple[str, str]:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 
-    # Usar ruta de indicadores desde env o por parámetro
     if not indicadores_path:
         indicadores_path = os.getenv("INDICADORES_PATH", "indicadores/indicadores.json")
 
@@ -115,10 +114,18 @@ def procesar_archivos_desde_entrada(files, indicadores_path: str = None) -> tupl
             raise ValueError("No se extrajo ningún dato de los archivos proporcionados.")
 
         combined_df = pd.concat(all_data, ignore_index=True)
+
+        # 🔧 Corrección crítica: aseguramos tipo numérico para evitar errores
+        combined_df["Remuneración"] = pd.to_numeric(combined_df["Remuneración"], errors="coerce")
+        combined_df["Cod."] = pd.to_numeric(combined_df["Cod."], errors="coerce")
+
         resumen_df = combined_df[
             (combined_df["Cod."] == 3) &
             (combined_df["Remuneración"] > 0)
         ]
+
+        # Evitar problemas con NaN
+        resumen_df = resumen_df.fillna(0)
 
         resumen_path = os.path.join(result_dir, SUMMARY_FILENAME)
         resumen_df.to_excel(resumen_path, index=False)
