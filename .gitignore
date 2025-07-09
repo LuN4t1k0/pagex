@@ -19,3 +19,5 @@ Thumbs.db
 
 # Archivos de compilación
 *.so
+
+*.DS_Store
