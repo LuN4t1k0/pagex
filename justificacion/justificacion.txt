@@ -1,0 +1,27 @@
+# ----------- TXT de justificación -----------
+txt_name = f"justificacion_{datetime.now():%Y%m%d_%H%M}.txt"
+txt_path = os.path.join(output_folder, txt_name)
+
+with open(txt_path, "w", encoding="utf-8") as f:
+    # Cabecera
+    f.write("Fecha de procesamiento: " + datetime.now().isoformat() + "\n")
+    f.write("PDFs procesados: " + ", ".join(pdfs_procesados) + "\n")
+    f.write(f"Registros con pago: {len(resumen)}\n\n")
+
+    # ➜  BLOQUE DE REGLAS (contexto)
+    f.write("REGLAS APLICADAS\n")
+    f.write("  RN-1  Licencia < 10 días (renta no-tope) paga sólo los 3 primeros días.\n")
+    f.write("  RN-2  Si un trabajador tiene varias licencias < 10 días en el mismo mes,\n")
+    f.write("        en total se pagan como máximo 3 días.\n")
+    f.write("  RN-3  Si la licencia < 10 días cruza de mes, sólo se pagan los días del mes\n")
+    f.write("        origen (máx. 3) y no se registra pago en el mes destino.\n")
+    f.write("  RT-1  Para renta tope se pagan todos los días de la(s) licencia(s).\n\n")
+
+    # Detalle por RUT-Periodo
+    for _, row in resumen.iterrows():
+        regla = "RT-1" if row["Tipo_Renta"] == "Renta Tope" else "RN-1 / RN-2"
+        f.write(f"{row['RUT']} – {row['Periodo']}\n")
+        f.write(f"  • Monto pagable (Rem_Días): ${int(row['Rem_Días']):,}\n")
+        f.write(f"    Regla aplicada: {regla}\n\n")
+
+print("Archivo de justificación generado:", txt_path)
