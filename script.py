@@ -96,9 +96,16 @@ def extrae_tablas(pdf_path):
 def procesa_dataframe(raw_rows, indicadores):
     # ---- carga básica
     df = pd.DataFrame(raw_rows, columns=required_columns)
+
+    # *** Convertir a numérico de inmediato ***
     df["Remuneración"] = pd.to_numeric(df["Remuneración"], errors="coerce")
-    df["Cod."] = pd.to_numeric(df["Cod."], errors="coerce")
-    df = df[~df["RUT"].str.contains("|".join(specific_headers), case=False, na=False)]
+    df["Cod."]         = pd.to_numeric(df["Cod."], errors="coerce")
+
+    # Quitar filas que son cabeceras fantasma
+    df = df[
+        ~df["RUT"].str.contains("|".join(specific_headers), case=False, na=False)
+    ]
+
 
     # ---- fechas originales
     df["Fecha Inicio"] = pd.to_datetime(df["Fecha Inicio"], dayfirst=True, errors="coerce")
