@@ -243,29 +243,63 @@ def procesa_dataframe(raw_rows, indicadores):
         per, afp = row["Periodo"], row["AFP"]
         try:
             idx = [a.lower() for a in ind[per]["afp"]["afp"]].index(afp.lower())
-            return float(ind[per]["afp"]["tasa_afp_dependientes"][idx]
-                         .replace("%","").replace(",",".")) - 10.0
+            return float(
+                ind[per]["afp"]["tasa_afp_dependientes"][idx]
+                .replace("%", "").replace(",", ".")
+            ) - 10.0
         except Exception:
             return 0.0
 
     agrup["Porcentaje"] = agrup.apply(pct_afp, axis=1)
     agrup["Pensión"]    = (agrup["Rem_Días"] * 0.10).round()
-    agrup["Comisión"]   = ((agrup["Porcentaje"]/100) * agrup["Rem_Días"]).round()
+    agrup["Comisión"]   = ((agrup["Porcentaje"] / 100) * agrup["Rem_Días"]).round()
     agrup["Total_AFP"]  = (agrup["Pensión"] + agrup["Comisión"]).astype(int)
 
-    # ---------- Fechas y columnas finales ----------
-    agrup["Fecha Inicio"]  = agrup["Periodo"].str[4:] + "-01-" + agrup["Periodo"].str[:4]
-    agrup["Fecha Término"] = ""
-    agrup.rename(columns={"Nombre":"Nombre completo", "Dias_mes":"Días"}, inplace=True)
+    # ---------- Fecha Inicio / Término reales ----------
+    def rango_fechas(key):
+        lic_lst = detalle_lic.get(key, [])
+        if not lic_lst:
+            return ("", "")
+        fechas_ini = [pd.to_datetime(l["ini"], dayfirst=True) for l in lic_lst]
+        fechas_fin = [pd.to_datetime(l["fin"], dayfirst=True) for l in lic_lst]
+        return (
+            min(fechas_ini).strftime("%d-%m-%Y"),
+            max(fechas_fin).strftime("%d-%m-%Y")
+        )
+
+    if not agrup.empty:
+        fechas_df = agrup.apply(
+            lambda r: rango_fechas((r["RUT"], r["Periodo"])),
+            axis=1,
+            result_type="expand"
+        )
+        agrup["Fecha Inicio"]  = fechas_df[0]
+        agrup["Fecha Término"] = fechas_df[1]
+    else:
+        agrup["Fecha Inicio"]  = ""
+        agrup["Fecha Término"] = ""
+
+    # ---------- Días efectivamente pagados (0-3 o todos) ----------
+    agrup["Días_pagados"] = (
+        (agrup["Rem_Días"] / agrup["Tasa_diaria"])
+        .round()
+        .astype(int)
+    )
+
+    # ---------- Renombres y orden final ----------
+    agrup.rename(columns={"Nombre": "Nombre completo",
+                          "Dias_mes": "Días"}, inplace=True)
 
     FINAL_COLS = [
-        "RUT","Nombre completo","Remuneración","Cod.",
-        "Periodo","Fecha Inicio","Fecha Término","AFP",
-        "Días","Tipo_Renta","Rem_Días","Pensión","Comisión","Total_AFP"
+        "RUT", "Nombre completo", "Remuneración", "Cod.",
+        "Periodo", "Fecha Inicio", "Fecha Término", "AFP",
+        "Días", "Días_pagados", "Tipo_Renta", "Rem_Días",
+        "Pensión", "Comisión", "Total_AFP"
     ]
     agrup = agrup.reindex(columns=FINAL_COLS)
 
     return agrup, detalle_lic
+
 
 # --------------------------------------------------
 # 3. FLUJO PRINCIPAL
