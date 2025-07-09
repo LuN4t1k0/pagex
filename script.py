@@ -98,7 +98,7 @@ def procesa_dataframe(raw_rows, indicadores):
     df["Cod."]         = pd.to_numeric(df["Cod."], errors="coerce")
     df = df[~df["RUT"].str.contains("|".join(specific_headers), case=False, na=False)]
 
-    # ---- fechas y días de cada LICENCIA original
+    # ---- fechas originales
     df["Fecha Inicio"]  = pd.to_datetime(df["Fecha Inicio"],  dayfirst=True, errors="coerce")
     df["Fecha Término"] = pd.to_datetime(df["Fecha Término"], dayfirst=True, errors="coerce")
     df["Dias_lic"]      = (df["Fecha Término"] - df["Fecha Inicio"]).dt.days + 1
@@ -108,9 +108,9 @@ def procesa_dataframe(raw_rows, indicadores):
         lambda r: "Renta Tope"
         if (
             pd.notna(r["Fecha Inicio"])
-            and (per := r["Fecha Inicio"].strftime("%Y%m")) in indicadores
+            and (p := r["Fecha Inicio"].strftime("%Y%m")) in indicadores
             and r["Remuneración"] >= float(
-                indicadores[per]["rentas_topes_imponibles"]["valor"][0]
+                indicadores[p]["rentas_topes_imponibles"]["valor"][0]
                 .replace("$", "").replace(".", "").replace(",", ".")
             )
         )
@@ -118,7 +118,12 @@ def procesa_dataframe(raw_rows, indicadores):
         axis=1,
     )
 
-    # ---- SEGMENTACIÓN por mes según reglas
+    # -----------------------------------------------------------------
+    #  Estructura para informe: (rut, periodo) -> [dict(...)]
+    # -----------------------------------------------------------------
+    detalle_lic = {}
+
+    # ---- SEGMENTACIÓN por mes
     segmentos = []
     for _, r in df.iterrows():
         if pd.isna(r["Fecha Inicio"]) or pd.isna(r["Fecha Término"]):
@@ -127,32 +132,59 @@ def procesa_dataframe(raw_rows, indicadores):
         rut, nom, ren, cod = r["RUT"], r["Apellido Paterno, Materno, Nombres"], r["Remuneración"], r["Cod."]
         afp = normaliza_afp(r["AFP"])
 
+        # --- Renta Tope → pagar todos los días por bloque mensual
         if r["Tipo_Renta"] == "Renta Tope":
             cur, end = r["Fecha Inicio"], r["Fecha Término"]
             while cur <= end:
                 fin_mes = pd.Timestamp(cur.year, cur.month, ultimo_dia_mes(cur))
-                bloque_fin = min(fin_mes, end)
-                dias = (bloque_fin - cur).days + 1
-                segmentos.append([rut, nom, ren, cod, afp,
-                                  cur.strftime("%Y%m"), dias, "Renta Tope"])
-                cur = bloque_fin + pd.Timedelta(days=1)
+                bloc_fin = min(fin_mes, end)
+                dias = (bloc_fin - cur).days + 1
+                per  = cur.strftime("%Y%m")
+
+                segmentos.append([rut, nom, ren, cod, afp, per, dias, "Renta Tope"])
+                detalle_lic.setdefault((rut, per), []).append(
+                    {"ini": cur.strftime("%d-%m-%Y"),
+                     "fin": bloc_fin.strftime("%d-%m-%Y"),
+                     "dias_orig": dias,
+                     "dias_pag": None,
+                     "motivo": ""}
+                )
+                cur = bloc_fin + pd.Timedelta(days=1)
+        # --- Renta No Tope (sólo licencias <10d)
         else:
             if r["Dias_lic"] >= 10:
                 continue
             start, end = r["Fecha Inicio"], r["Fecha Término"]
+
             if start.month == end.month and start.year == end.year:
-                segmentos.append([rut, nom, ren, cod, afp,
-                                  start.strftime("%Y%m"), r["Dias_lic"], "Renta No Tope"])
+                dias = r["Dias_lic"]
+                per  = start.strftime("%Y%m")
+                segmentos.append([rut, nom, ren, cod, afp, per, dias, "Renta No Tope"])
+                detalle_lic.setdefault((rut, per), []).append(
+                    {"ini": start.strftime("%d-%m-%Y"),
+                     "fin": end.strftime("%d-%m-%Y"),
+                     "dias_orig": dias,
+                     "dias_pag": None,
+                     "motivo": ""}
+                )
             else:
                 dias_origen = ultimo_dia_mes(start) - start.day + 1
-                segmentos.append([rut, nom, ren, cod, afp,
-                                  start.strftime("%Y%m"), dias_origen, "Renta No Tope"])
+                per  = start.strftime("%Y%m")
+                segmentos.append([rut, nom, ren, cod, afp, per, dias_origen, "Renta No Tope"])
+                detalle_lic.setdefault((rut, per), []).append(
+                    {"ini": start.strftime("%d-%m-%Y"),
+                     "fin": pd.Timestamp(start.year, start.month, ultimo_dia_mes(start)).strftime("%d-%m-%Y"),
+                     "dias_orig": dias_origen,
+                     "dias_pag": None,
+                     "motivo": ""}
+                )
 
+    # ---------- DataFrame de segmentos ----------
     seg_df = pd.DataFrame(segmentos, columns=[
         "RUT","Nombre","Remuneración","Cod.","AFP","Periodo","Dias_segmento","Tipo_Renta"
     ])
 
-    # ---- AGRUPACIÓN por RUT + Periodo
+    # ---------- AGRUPACIÓN mínima -------------
     agrup = (
         seg_df
         .groupby(["RUT", "Periodo"], as_index=False)
@@ -160,39 +192,50 @@ def procesa_dataframe(raw_rows, indicadores):
             "Nombre": "first",
             "Remuneración": "max",
             "Cod.": "first",
-            "AFP": lambda x: x.mode()[0] if len(x) else "",
+            "AFP":  lambda x: x.mode()[0] if len(x) else "",
             "Tipo_Renta": "first",
             "Dias_segmento": "sum"
         })
         .rename(columns={"Dias_segmento": "Dias_mes"})
     )
 
-    # ---- Rem_Días
-    agrup["Rem_Días"] = agrup.apply(
-        lambda r: r["Dias_mes"] if r["Tipo_Renta"] == "Renta Tope"
-        else min(3, r["Dias_mes"]) if r["Dias_mes"] < 10
-        else 0,
-        axis=1
-    )
-
-    agrup = agrup[agrup["Rem_Días"] > 0]      # descarta filas sin pago
-
-
-    # ---- Añade justo DESPUÉS del bloque de agrupación y ANTES de filtrar Rem_Días
+    # ---------- Rem_Días (monto) -------------
     agrup["Tasa_diaria"] = agrup["Remuneración"] / 30
 
-    def calc_rem_pesos(row):
+    def calc_monto(row):
         if row["Tipo_Renta"] == "Renta Tope":
-            dias_pagables = row["Dias_mes"]                # se pagan todos
+            dias_pag = row["Dias_mes"]
         else:
-            dias_pagables = min(3, row["Dias_mes"]) if row["Dias_mes"] < 10 else 0
-        return round(dias_pagables * row["Tasa_diaria"], 0)
+            dias_pag = min(3, row["Dias_mes"]) if row["Dias_mes"] < 10 else 0
+        return round(dias_pag * row["Tasa_diaria"], 0)
 
-    agrup["Rem_Días"] = agrup.apply(calc_rem_pesos, axis=1)
-    agrup = agrup[agrup["Rem_Días"] > 0]                   # descarta sin pago
+    agrup["Rem_Días"] = agrup.apply(calc_monto, axis=1)
+    agrup = agrup[agrup["Rem_Días"] > 0]
 
+    # ---------- REPARTO de días pagados a cada licencia ----------
+    for _, row in agrup.iterrows():
+        clave = (row["RUT"], row["Periodo"])
+        lic_list = detalle_lic.get(clave, [])
+        if not lic_list:
+            continue
 
-    # ---- Columnas monetarias
+        if row["Tipo_Renta"] == "Renta Tope":
+            for lic in lic_list:
+                lic["dias_pag"] = lic["dias_orig"]
+                lic["motivo"]   = "RT-1 (pago completo)"
+        else:
+            saldo = min(3, row["Dias_mes"]) if row["Dias_mes"] < 10 else 0
+            for lic in sorted(lic_list, key=lambda x: pd.to_datetime(x["ini"], dayfirst=True)):
+                if saldo > 0:
+                    pagar = min(lic["dias_orig"], saldo)
+                    lic["dias_pag"] = pagar
+                    lic["motivo"]   = "Pagado (RN-1/RN-2)"
+                    saldo -= pagar
+                else:
+                    lic["dias_pag"] = 0
+                    lic["motivo"]   = "RN-1/RN-2 → 0"
+
+    # ---------- Columnas monetarias ----------
     with open(json_path, encoding="utf-8") as f:
         ind = json.load(f)
 
@@ -210,87 +253,101 @@ def procesa_dataframe(raw_rows, indicadores):
     agrup["Comisión"]   = ((agrup["Porcentaje"]/100) * agrup["Rem_Días"]).round()
     agrup["Total_AFP"]  = (agrup["Pensión"] + agrup["Comisión"]).astype(int)
 
-    # ---- Etiquetas y fechas
-    agrup["Análisis_Individual"] = "CORRESPONDE"
-    agrup["Análisis_Grupo"]      = "CORRESPONDE"
-    agrup["Resumen"]             = "Individual: CORRESPONDE, Grupo: CORRESPONDE"
-    agrup["Fecha Inicio"]        = agrup["Periodo"].str[4:] + "-01-" + agrup["Periodo"].str[:4]
-    agrup["Fecha Término"]       = ""
+    # ---------- Fechas y columnas finales ----------
+    agrup["Fecha Inicio"]  = agrup["Periodo"].str[4:] + "-01-" + agrup["Periodo"].str[:4]
+    agrup["Fecha Término"] = ""
+    agrup.rename(columns={"Nombre":"Nombre completo", "Dias_mes":"Días"}, inplace=True)
 
-    agrup.rename(columns={"Nombre":"Apellido Paterno, Materno, Nombres",
-                          "Dias_mes":"Días"}, inplace=True)
-
-    # ---- Depuración: mostrar columnas clave
-    print("\n>> DEBUG – primeros registros con columnas monetarias")
-    print(
-        agrup[[
-            "RUT","Periodo","Tipo_Renta","Días","Rem_Días",
-            "Porcentaje","Pensión","Comisión","Total_AFP"
-        ]].head(10)
-    )
-    print("Filas con pago en este PDF:", len(agrup))
-    print("----------------------------------------------------------\n")
-
-    # ---- Asegura estructura completa
-    FULL_COLS = [
-        "RUT","Apellido Paterno, Materno, Nombres","Remuneración","Cod.",
-        "Fecha Inicio","Fecha Término","AFP","Días","Rem_Días",
-        "Pensión","Comisión","Total_AFP","Tipo_Renta","Periodo",
-        "Análisis_Individual","Análisis_Grupo","Resumen"
+    FINAL_COLS = [
+        "RUT","Nombre completo","Remuneración","Cod.",
+        "Periodo","Fecha Inicio","Fecha Término","AFP",
+        "Días","Tipo_Renta","Rem_Días","Pensión","Comisión","Total_AFP"
     ]
-    agrup = agrup.reindex(columns=FULL_COLS)
+    agrup = agrup.reindex(columns=FINAL_COLS)
 
-    # ---- Depuración: listado de columnas finales
-    print(">> DEBUG – columnas del DataFrame final:", agrup.columns.tolist(), "\n")
-
-    return agrup
+    return agrup, detalle_lic
 
 # --------------------------------------------------
 # 3. FLUJO PRINCIPAL
 # --------------------------------------------------
+from datetime import datetime
+
 def main():
     os.makedirs(output_folder, exist_ok=True)
 
-    # Cargar indicadores una sola vez
     with open(json_path, encoding="utf-8") as f:
         indicadores = json.load(f)
 
-    dataframes = []
-    for file in tqdm(os.listdir(input_folder), desc="PDFs", unit="archivo"):
-        if file.lower().endswith(".pdf"):
-            raws = extrae_tablas(os.path.join(input_folder, file))
-            if raws:
-                dataframes.append(procesa_dataframe(raws, indicadores))
+    dataframes, detalles_global, pdfs = [], {}, []
+
+    # ---------- recorrer PDFs ----------
+    for file in os.listdir(input_folder):
+        if not file.lower().endswith(".pdf"):
+            continue
+        pdf_path = os.path.join(input_folder, file)
+        raws = extrae_tablas(pdf_path)
+        if not raws:
+            continue
+        df_res, det_pdf = procesa_dataframe(raws, indicadores)
+        dataframes.append(df_res)
+        # merge de detalles
+        for k, v in det_pdf.items():
+            detalles_global.setdefault(k, []).extend(v)
+        pdfs.append(file)
 
     if not dataframes:
-        print("No se extrajo ningún dato de los PDFs.")
+        print("No se extrajo ningún dato.")
         return
 
     df = pd.concat(dataframes, ignore_index=True)
 
-    expected = ["Pensión","Comisión","Total_AFP"]
-    missing  = [c for c in expected if c not in df.columns]
-    print("Faltan:", missing)
-
-
-
-    df.to_excel(combined_excel_path, index=False)
-    print(f"Archivo combinado guardado: {combined_excel_path}")
-
-    # ----- RESUMEN (mismo criterio que antes) -----
+    # ---------- RESUMEN ----------
     resumen = df[(df["Cod."] == 3) & (df["Remuneración"] > 0)]
     if resumen.empty:
-        print("No hay registros que cumplan criterio de resumen.")
+        print("Sin registros que cumplan criterio.")
         return
+
     resumen.to_excel(summary_excel_path, index=False)
-    print(f"Resumen guardado en: {summary_excel_path}")
+    print("Resumen guardado en:", summary_excel_path)
 
+    # ---------- Archivos por AFP ----------
     for afp, g in resumen.groupby("AFP"):
-        fname = f"AFP_{afp.replace(' ','_')}.xlsx"
-        g.to_excel(os.path.join(output_folder, fname), index=False)
-    print("Archivos por AFP generados correctamente.")
+        g.to_excel(os.path.join(output_folder, f"AFP_{afp.replace(' ','_')}.xlsx"), index=False)
+    print("Archivos por AFP generados.")
 
-    
+    # ---------- TXT de justificación ----------
+    txt_path = os.path.join(output_folder,
+                f"justificacion_{datetime.now():%Y%m%d_%H%M}.txt")
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write("Fecha de procesamiento: " + datetime.now().isoformat() + "\n")
+        f.write("PDFs procesados: " + ", ".join(pdfs) + "\n")
+        f.write(f"Registros con pago: {len(resumen)}\n\n")
+
+        # reglas
+        f.write("REGLAS APLICADAS\n")
+        f.write("  RN-1  Licencia <10 días paga máx. 3 días.\n")
+        f.write("  RN-2  Suma mensual <10 días paga máx. 3 días en total.\n")
+        f.write("  RN-3  Si cruza mes (<10d) sólo paga el mes origen.\n")
+        f.write("  RT-1  Renta Tope paga todos los días.\n\n")
+
+        # detalle por RUT-Periodo
+        for _, row in resumen.iterrows():
+            clave = (row["RUT"], row["Periodo"])
+            f.write(f"{row['RUT']} – {row['Periodo']}\n")
+            f.write(f"  • Monto pagable: ${int(row['Rem_Días']):,}\n")
+            f.write(f"    Regla mes: {'RT-1 (Tope)' if row['Tipo_Renta']=='Renta Tope' else 'RN-1/RN-2'}\n")
+            f.write(f"    Licencias analizadas:\n")
+            for lic in detalles_global.get(clave, []):
+                f.write(
+                    f"      - {lic['ini']} → {lic['fin']}  "
+                    f"(orig: {lic['dias_orig']} d, pagados: {lic['dias_pag']} d)  "
+                    f"{lic['motivo']}\n"
+                )
+            f.write("\n")
+
+    print("Justificación generada:", txt_path)
 
 if __name__ == "__main__":
     main()
+    
+
