@@ -506,60 +506,79 @@ def is_header_row(row: list[str]) -> bool:
 
 def extrae_licencias(pdf_path: str) -> list[dict]:
     """
-    Devuelve dicts con cada licencia (Cod. 3).
-    Se salta la 1.ª página y usa las 3 últimas columnas de la fila
-    (Cod., Fecha Inicio, Fecha Término), que son estables.
+    Extrae TODAS las líneas (no sólo Cod. 3) a partir de la segunda página
+    de un PDF Previred y devuelve una lista de dict con:
+
+        rut, nombre, remun, cod, inicio, fin, afp, src
+
+    • La AFP se detecta en la portada.
+    • Las 3 últimas columnas de cada fila son: Cod., Fecha Inicio, Fecha Término.
+    • Fechas aceptan «dd/mm/aaaa» o «dd-mm-aaaa».
     """
-    licencias = []
+    licencias: list[dict] = []
     afp_name = "Desconocida"
+
+    # --- helper para fechas -------------------------------------------------
+    def parse_date(text: str) -> datetime:
+        text = text.strip()
+        for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+            try:
+                return datetime.strptime(text, fmt)
+            except ValueError:
+                continue
+        raise ValueError(f"Formato de fecha desconocido: {text}")
 
     try:
         with pdfplumber.open(pdf_path) as pdf:
-            # --- AFP en la página 0 (sigue igual) -----------
-            m = re.search(r"AFP\s+(\w+)", pdf.pages[0].extract_text() or "", re.IGNORECASE)
+            # 1) AFP en la portada (página 0)
+            portada_txt = pdf.pages[0].extract_text() or ""
+            m = re.search(r"AFP\s+(\w+)", portada_txt, re.IGNORECASE)
             if m:
                 afp_name = m.group(1)
 
-            # --- SOLO de la 2.ª página en adelante ----------
+            # 2) Recorrer SOLO de la 2.ª página en adelante
             for pg in pdf.pages[1:]:
                 table = pg.extract_table()
                 if not table:
                     continue
 
                 for row in table:
-                    # 1) descartar filas de cabecera
+                    # a) descartar cabeceras
                     if not row or is_header_row(row):
                         continue
-                    # 2) necesitamos al menos 6 columnas
+                    # b) al menos 6 columnas (formato AFP Capital)
                     if len(row) < 6:
                         continue
 
-                    # 3) Datos seguros:
-                    rut     = row[0].strip()
-                    nombre  = row[1].strip()
-                    remun_s = re.sub(r"[^\d,]", "", row[2]).replace(",", ".") or "0"
+                    # --- columnas relevantes --------------------------------
+                    rut    = row[0].strip()
+                    nombre = row[1].strip()
+
+                    # Remuneración: limpiar separador de miles y convertir a float
+                    remun_txt = re.sub(r"[^\d,]", "", row[2]).replace(",", ".") or "0"
                     try:
-                        remun = float(remun_s)
+                        remun = float(remun_txt)
                     except ValueError:
-                        remun = 0
+                        remun = 0.0
 
-                    # Las 3 últimas columnas son siempre: Cod., Fecha Inicio, Fecha Término
-                    cod_str, fecha_ini, fecha_fin = row[-3], row[-2], row[-1]
+                    # Últimas tres celdas → Cod., Fecha Inicio, Fecha Término
+                    cod_txt, fecha_ini_txt, fecha_fin_txt = row[-3], row[-2], row[-1]
 
-                    # Validar código 3
-                    cod_str = re.sub(r"[^\d]", "", cod_str or "")
-                    if cod_str != "3":
-                        continue
+                    cod_txt = re.sub(r"[^\d]", "", cod_txt or "")
+                    cod = int(cod_txt) if cod_txt else 0  # 0 si viene vacío
 
                     try:
+                        fecha_ini = parse_date(fecha_ini_txt)
+                        fecha_fin = parse_date(fecha_fin_txt)
+
                         licencias.append(
                             {
                                 "rut"   : rut,
                                 "nombre": nombre,
                                 "remun" : remun,
-                                "cod"   : 3,
-                                "inicio": datetime.strptime(fecha_ini.strip(), "%d/%m/%Y"),
-                                "fin"   : datetime.strptime(fecha_fin.strip(), "%d/%m/%Y"),
+                                "cod"   : cod,
+                                "inicio": fecha_ini,
+                                "fin"   : fecha_fin,
                                 "afp"   : normaliza_afp(afp_name),
                                 "src"   : os.path.basename(pdf_path),
                             }
@@ -832,11 +851,19 @@ def procesa_licencias(lic_raw: list[dict], indicadores: dict):
 # 3. FLUJO PRINCIPAL
 # --------------------------------------------------
 def main():
+    """
+    Flujo principal:
+        1. Lee PDFs y extrae TODAS las líneas (cód. varios)
+        2. Aplica reglas y cálculos → pagos_df (resumen) + lic_df (detalle)
+        3. Genera        pagos_corresponde.xlsx   (solo Cod. 3 aprobados)
+                        analisis_licencias_codigo3.xlsx (todos Cod. 3)
+        4. No genera TXT de justificación
+    """
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     indicadores = lee_indicadores()
 
-    licencias_totales = []
-    pdfs_proc = []
+    licencias_totales: list[dict] = []
+    pdfs_proc: list[str] = []
 
     print("Extrayendo licencias de PDF…")
     for file in tqdm(os.listdir(INPUT_FOLDER)):
@@ -849,29 +876,56 @@ def main():
             pdfs_proc.append(file)
 
     if not licencias_totales:
-        print("No se extrajeron licencias (Cod. 3) en los PDF.")
+        print("No se extrajeron líneas de licencias en los PDF.")
         return
 
     # Procesar reglas
     pagos_df, lic_df = procesa_licencias(licencias_totales, indicadores)
 
-    # Guardar archivos
-    pagos_df.to_excel(RESUMEN_PATH, index=False)
-    lic_df.to_excel(DETALLE_PATH, index=False)
-
-    print(f"► Resumen guardado en: {RESUMEN_PATH}")
-    print(f"► Análisis detallado guardado en: {DETALLE_PATH}")
-
-    # Log de justificación rápido
-    justif = os.path.join(
-        OUTPUT_FOLDER, f"justificacion_{datetime.now():%Y%m%d_%H%M}.txt"
+    # ------------------------------------------------------------
+    # Añadir nombre(s) de PDF origen a pagos_df para trazabilidad
+    # ------------------------------------------------------------
+    archivos_grp = (
+        lic_df.groupby(["RUT", "periodo"])["src"]
+        .apply(lambda s: ", ".join(sorted(set(s))))
+        .reset_index(name="archivos_pdf")
     )
-    with open(justif, "w", encoding="utf-8") as f:
-        f.write(f"Procesados: {len(pdfs_proc)} PDF(s)\n")
-        f.write("Archivos: " + ", ".join(pdfs_proc) + "\n")
-        f.write(f"Registros detalle: {len(lic_df)}\n")
-        f.write(f"Registros resumen: {len(pagos_df)}\n")
-    print(f"► Justificación generada: {justif}")
+    pagos_df = (
+        pagos_df.merge(
+            archivos_grp,
+            left_on=["RUT", "Periodo"],  # 'Periodo' ya viene renombrado en pagos_df
+            right_on=["RUT", "periodo"],
+        )
+        .drop(columns=["periodo"])
+    )
+
+    # ------------------------------------------------------------
+    # ①  Archivo de pagos solo Cod. 3 + aprobados
+    # ------------------------------------------------------------
+    pagos_corresponde = pagos_df[
+        (pagos_df["Cod."] == 3) & (pagos_df["estado"] == "aprobado")
+    ].copy()
+
+    pagos_corresponde_path = os.path.join(OUTPUT_FOLDER, "pagos_corresponde.xlsx")
+    pagos_corresponde.to_excel(pagos_corresponde_path, index=False)
+    print(f"► pagos_corresponde.xlsx generado: {pagos_corresponde_path}")
+
+    # ------------------------------------------------------------
+    # ②  Archivo de análisis completo (Cod. 3 aprobados + rechazados)
+    # ------------------------------------------------------------
+    # Orden de columnas similar al resumen, más 'archivos_pdf'
+    col_order = [
+        "RUT", "Nombre completo", "Remuneracion", "Cod.", "Periodo",
+        "Fecha Inicio", "Fecha Término", "AFP",
+        "dias_licencia", "dias_pagados",
+        "monto_rem_dias", "aporte_pension", "comision_afp", "total_aporte_afp",
+        "estado", "comentario", "archivos_pdf",
+    ]
+    analisis_df = pagos_df[col_order]
+
+    analisis_path = os.path.join(OUTPUT_FOLDER, "analisis_licencias_codigo3.xlsx")
+    analisis_df.to_excel(analisis_path, index=False)
+    print(f"► analisis_licencias_codigo3.xlsx generado: {analisis_path}")
 
 
 if __name__ == "__main__":
