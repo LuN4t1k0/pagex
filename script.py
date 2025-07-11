@@ -656,15 +656,24 @@ def extrae_licencias(pdf_path: str) -> list[dict]:
                 ini = _parse_fecha(ini_txt)
                 fin = _parse_fecha(fin_txt) or ini  # si fin vacío → ini
 
-                # -------- derivar período ----------
+# -------- derivar período ----------
                 if ini:
+                    # tenemos Fecha Inicio  → usamos esa
                     periodo_linea = ini.strftime("%Y%m")
-                else:
-                    if not periodo_pdf:
-                        # No hay fechas ni encabezado → descartar fila
-                        continue
+
+                elif fin:
+                    # sólo tenemos Fecha Término → usamos esa
+                    periodo_linea = fin.strftime("%Y%m")
+
+                elif periodo_pdf:
+                    # no hay fechas en la fila, pero sí “Período de Remuneraciones: MM/AAAA”
                     ini = fin = datetime.strptime(periodo_pdf + "01", "%Y%m%d")
                     periodo_linea = periodo_pdf
+
+                else:
+                    # sin fechas ni encabezado → fila inútil, se descarta
+                    continue
+
 
                 licencias.append(
                     {
