@@ -940,3 +940,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    # al final de script.py  (o en __all__)
+__all__ = ["extrae_licencias", "procesa_licencias"]
