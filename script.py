@@ -504,92 +504,184 @@ def is_header_row(row: list[str]) -> bool:
         for cell in row for pat in HEADER_PATTERNS
     ) or any(h in str(cell) for cell in row for h in SPECIFIC_HEADERS)
 
+# def extrae_licencias(pdf_path: str) -> list[dict]:
+#     """
+#     Extrae TODAS las líneas (no sólo Cod. 3) a partir de la segunda página
+#     de un PDF Previred y devuelve una lista de dict con:
+
+#         rut, nombre, remun, cod, inicio, fin, afp, src
+
+#     • La AFP se detecta en la portada.
+#     • Las 3 últimas columnas de cada fila son: Cod., Fecha Inicio, Fecha Término.
+#     • Fechas aceptan «dd/mm/aaaa» o «dd-mm-aaaa».
+#     """
+#     licencias: list[dict] = []
+#     afp_name = "Desconocida"
+
+#     # --- helper para fechas -------------------------------------------------
+#     def parse_date(text: str) -> datetime:
+#         text = text.strip()
+#         for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+#             try:
+#                 return datetime.strptime(text, fmt)
+#             except ValueError:
+#                 continue
+#         raise ValueError(f"Formato de fecha desconocido: {text}")
+
+#     try:
+#         with pdfplumber.open(pdf_path) as pdf:
+#             # 1) AFP en la portada (página 0)
+#             portada_txt = pdf.pages[0].extract_text() or ""
+#             m = re.search(r"AFP\s+(\w+)", portada_txt, re.IGNORECASE)
+#             if m:
+#                 afp_name = m.group(1)
+
+#             # 2) Recorrer SOLO de la 2.ª página en adelante
+#             for pg in pdf.pages[1:]:
+#                 table = pg.extract_table()
+#                 if not table:
+#                     continue
+
+#                 for row in table:
+#                     # a) descartar cabeceras
+#                     if not row or is_header_row(row):
+#                         continue
+#                     # b) al menos 6 columnas (formato AFP Capital)
+#                     if len(row) < 6:
+#                         continue
+
+#                     # --- columnas relevantes --------------------------------
+#                     rut    = row[0].strip()
+#                     nombre = row[1].strip()
+
+#                     # Remuneración: limpiar separador de miles y convertir a float
+#                     remun_txt = re.sub(r"[^\d,]", "", row[2]).replace(",", ".") or "0"
+#                     try:
+#                         remun = float(remun_txt)
+#                     except ValueError:
+#                         remun = 0.0
+
+#                     # Últimas tres celdas → Cod., Fecha Inicio, Fecha Término
+#                     cod_txt, fecha_ini_txt, fecha_fin_txt = row[-3], row[-2], row[-1]
+
+#                     cod_txt = re.sub(r"[^\d]", "", cod_txt or "")
+#                     cod = int(cod_txt) if cod_txt else 0  # 0 si viene vacío
+
+#                     try:
+#                         fecha_ini = parse_date(fecha_ini_txt)
+#                         fecha_fin = parse_date(fecha_fin_txt)
+
+#                         licencias.append(
+#                             {
+#                                 "rut"   : rut,
+#                                 "nombre": nombre,
+#                                 "remun" : remun,
+#                                 "cod"   : cod,
+#                                 "inicio": fecha_ini,
+#                                 "fin"   : fecha_fin,
+#                                 "afp"   : normaliza_afp(afp_name),
+#                                 "src"   : os.path.basename(pdf_path),
+#                             }
+#                         )
+#                     except Exception as e:
+#                         logging.error(f"Fila malformada en {pdf_path}: {e}")
+
+#     except Exception as e:
+#         logging.error(f"No se pudo abrir {pdf_path}: {e}")
+
+#     return licencias
+
 def extrae_licencias(pdf_path: str) -> list[dict]:
     """
-    Extrae TODAS las líneas (no sólo Cod. 3) a partir de la segunda página
-    de un PDF Previred y devuelve una lista de dict con:
-
-        rut, nombre, remun, cod, inicio, fin, afp, src
-
-    • La AFP se detecta en la portada.
-    • Las 3 últimas columnas de cada fila son: Cod., Fecha Inicio, Fecha Término.
-    • Fechas aceptan «dd/mm/aaaa» o «dd-mm-aaaa».
+    • Lee TODAS las líneas de un PDF Previred (cód. 0-99) a partir de la 2.ª página.
+    • Si falta 'Fecha Término', usa la misma que 'Fecha Inicio'.
+    • Si ambas fechas están vacías, deriva el período desde el encabezado
+      “Período de Remuneraciones: MM/AAAA” y asigna 01/MM/AAAA.
+    • Devuelve dicts con claves:
+        rut, nombre, remun, cod, inicio, fin, periodo, afp, src
     """
+    from datetime import datetime
+    import re, os, pdfplumber
+
     licencias: list[dict] = []
     afp_name = "Desconocida"
+    periodo_pdf = None  # MM/AAAA del encabezado
 
-    # --- helper para fechas -------------------------------------------------
-    def parse_date(text: str) -> datetime:
-        text = text.strip()
+    # ---------- helpers ----------
+    def s(cell) -> str:
+        """Devuelve cadena segura ("" si cell es None)."""
+        return str(cell or "").strip()
+
+    def _parse_fecha(txt: str) -> datetime | None:
+        txt = s(txt)
         for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
             try:
-                return datetime.strptime(text, fmt)
+                return datetime.strptime(txt, fmt)
             except ValueError:
                 continue
-        raise ValueError(f"Formato de fecha desconocido: {text}")
+        return None  # si viene vacío o formato desconocido
 
-    try:
-        with pdfplumber.open(pdf_path) as pdf:
-            # 1) AFP en la portada (página 0)
-            portada_txt = pdf.pages[0].extract_text() or ""
-            m = re.search(r"AFP\s+(\w+)", portada_txt, re.IGNORECASE)
-            if m:
-                afp_name = m.group(1)
+    # ---------- abrir PDF ----------
+    with pdfplumber.open(pdf_path) as pdf:
+        portada = pdf.pages[0].extract_text() or ""
+        m_afp = re.search(r"AFP\s+(\w+)", portada, re.IGNORECASE)
+        if m_afp:
+            afp_name = m_afp.group(1)
 
-            # 2) Recorrer SOLO de la 2.ª página en adelante
-            for pg in pdf.pages[1:]:
-                table = pg.extract_table()
-                if not table:
+        m_per = re.search(r"Per[ií]odo de Remuneraciones:\s*(\d{2})/(\d{4})", portada)
+        if m_per:
+            periodo_pdf = f"{m_per.group(2)}{m_per.group(1)}"  # YYYYMM
+
+        # ---------- recorrer detalle (páginas 2+) ----------
+        for pg in pdf.pages[1:]:
+            for row in (pg.extract_table() or []):
+                # descartar cabeceras y filas cortas
+                if not row or is_header_row(row) or len(row) < 6:
                     continue
 
-                for row in table:
-                    # a) descartar cabeceras
-                    if not row or is_header_row(row):
+                # columnas básicas con helper seguro
+                rut, nombre = s(row[0]), s(row[1])
+                if not rut:  # sin RUT → descartar
+                    continue
+
+                remun_txt = re.sub(r"[^\d,]", "", s(row[2])).replace(",", ".") or "0"
+                try:
+                    remun = float(remun_txt)
+                except ValueError:
+                    remun = 0.0
+
+                cod_txt, ini_txt, fin_txt = s(row[-3]), s(row[-2]), s(row[-1])
+                cod = int(re.sub(r"[^\d]", "", cod_txt) or 0)
+
+                ini = _parse_fecha(ini_txt)
+                fin = _parse_fecha(fin_txt) or ini  # si fin vacío → ini
+
+                # -------- derivar período ----------
+                if ini:
+                    periodo_linea = ini.strftime("%Y%m")
+                else:
+                    if not periodo_pdf:
+                        # No hay fechas ni encabezado → descartar fila
                         continue
-                    # b) al menos 6 columnas (formato AFP Capital)
-                    if len(row) < 6:
-                        continue
+                    ini = fin = datetime.strptime(periodo_pdf + "01", "%Y%m%d")
+                    periodo_linea = periodo_pdf
 
-                    # --- columnas relevantes --------------------------------
-                    rut    = row[0].strip()
-                    nombre = row[1].strip()
-
-                    # Remuneración: limpiar separador de miles y convertir a float
-                    remun_txt = re.sub(r"[^\d,]", "", row[2]).replace(",", ".") or "0"
-                    try:
-                        remun = float(remun_txt)
-                    except ValueError:
-                        remun = 0.0
-
-                    # Últimas tres celdas → Cod., Fecha Inicio, Fecha Término
-                    cod_txt, fecha_ini_txt, fecha_fin_txt = row[-3], row[-2], row[-1]
-
-                    cod_txt = re.sub(r"[^\d]", "", cod_txt or "")
-                    cod = int(cod_txt) if cod_txt else 0  # 0 si viene vacío
-
-                    try:
-                        fecha_ini = parse_date(fecha_ini_txt)
-                        fecha_fin = parse_date(fecha_fin_txt)
-
-                        licencias.append(
-                            {
-                                "rut"   : rut,
-                                "nombre": nombre,
-                                "remun" : remun,
-                                "cod"   : cod,
-                                "inicio": fecha_ini,
-                                "fin"   : fecha_fin,
-                                "afp"   : normaliza_afp(afp_name),
-                                "src"   : os.path.basename(pdf_path),
-                            }
-                        )
-                    except Exception as e:
-                        logging.error(f"Fila malformada en {pdf_path}: {e}")
-
-    except Exception as e:
-        logging.error(f"No se pudo abrir {pdf_path}: {e}")
+                licencias.append(
+                    {
+                        "rut": rut,
+                        "nombre": nombre,
+                        "remun": remun,
+                        "cod": cod,
+                        "inicio": ini,
+                        "fin": fin,
+                        "periodo": periodo_linea,
+                        "afp": normaliza_afp(afp_name),
+                        "src": os.path.basename(pdf_path),
+                    }
+                )
 
     return licencias
+
 
 # --------------------------------------------------
 # 2. PROCESAMIENTO Y REGLAS
