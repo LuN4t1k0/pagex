@@ -428,6 +428,7 @@ from collections import defaultdict
 import pdfplumber
 import pandas as pd
 from tqdm import tqdm
+from typing import List, Dict, Any
 
 # --------------------------------------------------
 # CONFIGURACIÓN GENERAL
@@ -591,106 +592,104 @@ def is_header_row(row: list[str]) -> bool:
 
 #     return licencias
 
-def extrae_licencias(pdf_path: str) -> list[dict]:
-    """
-    • Lee TODAS las líneas de un PDF Previred (cód. 0-99) a partir de la 2.ª página.
-    • Si falta 'Fecha Término', usa la misma que 'Fecha Inicio'.
-    • Si ambas fechas están vacías, deriva el período desde el encabezado
-      “Período de Remuneraciones: MM/AAAA” y asigna 01/MM/AAAA.
-    • Devuelve dicts con claves:
-        rut, nombre, remun, cod, inicio, fin, periodo, afp, src
-    """
-    from datetime import datetime
-    import re, os, pdfplumber
+# ---------- regex pre-compilados ----------
+RE_AFP       = re.compile(r"AFP\s+(\w+)", re.I)
+RE_PERIOD     = re.compile(r"Per[ií]odo de Remuneraciones:\s*(\d{2})/(\d{4})")
+RE_ONLY_DIGITS = re.compile(r"[^\d]")
+RE_MONEY_CSL   = re.compile(r"[^\d,]")      # para limpiar remuneración
 
+# ---------- columnas mínimas esperadas ----------
+COL_RUT   = 0
+COL_NAME  = 1
+COL_REMUN = 2
+# las tres últimas columnas: cod, fecha_ini, fecha_fin
+
+# ---------- helpers ----------
+def s(val) -> str:
+    """Devuelve `str(val).strip()` manejando None."""
+    return str(val or "").strip()
+
+def parse_fecha(text: str) -> datetime | None:
+    text = s(text)
+    for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+    return None
+
+def clean_money(raw: str) -> float:
+    txt = RE_MONEY_CSL.sub("", s(raw)).replace(",", ".") or "0"
+    try:
+        return float(txt)
+    except ValueError:
+        return 0.0
+
+def is_valid_rut(rut: str) -> bool:
+    """Valida formato básico NN.NNN.NNN-K (sin dígito verificador)."""
+    rtn = RE_ONLY_DIGITS.sub("", rut)
+    return 7 <= len(rtn) <= 9  # muy simple; ajusta si necesitas dv
+
+# ---------- función principal ----------
+def extrae_licencias(pdf_path: str) -> List[Dict[str, Any]]:
     licencias: list[dict] = []
     afp_name = "Desconocida"
-    periodo_pdf = None  # MM/AAAA del encabezado
+    periodo_pdf = None                              # YYYYMM
 
-    # ---------- helpers ----------
-    def s(cell) -> str:
-        """Devuelve cadena segura ("" si cell es None)."""
-        return str(cell or "").strip()
-
-    def _parse_fecha(txt: str) -> datetime | None:
-        txt = s(txt)
-        for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
-            try:
-                return datetime.strptime(txt, fmt)
-            except ValueError:
-                continue
-        return None  # si viene vacío o formato desconocido
-
-    # ---------- abrir PDF ----------
     with pdfplumber.open(pdf_path) as pdf:
-        portada = pdf.pages[0].extract_text() or ""
-        m_afp = re.search(r"AFP\s+(\w+)", portada, re.IGNORECASE)
-        if m_afp:
-            afp_name = m_afp.group(1)
+        portada_txt = pdf.pages[0].extract_text() or ""
 
-        m_per = re.search(r"Per[ií]odo de Remuneraciones:\s*(\d{2})/(\d{4})", portada)
-        if m_per:
-            periodo_pdf = f"{m_per.group(2)}{m_per.group(1)}"  # YYYYMM
+        if (m := RE_AFP.search(portada_txt)):
+            afp_name = m.group(1)
 
-        # ---------- recorrer detalle (páginas 2+) ----------
+        if (m := RE_PERIOD.search(portada_txt)):
+            periodo_pdf = f"{m.group(2)}{m.group(1)}"  # YYYYMM
+
+        # ---------- recorrer desde la 2.ª página ----------
         for pg in pdf.pages[1:]:
             for row in (pg.extract_table() or []):
-                # descartar cabeceras y filas cortas
-                if not row or is_header_row(row) or len(row) < 6:
+                if not row or len(row) < 6 or is_header_row(row):
                     continue
 
-                # columnas básicas con helper seguro
-                rut, nombre = s(row[0]), s(row[1])
-                if not rut:  # sin RUT → descartar
+                rut = s(row[COL_RUT])
+                if not rut or not is_valid_rut(rut):
                     continue
 
-                remun_txt = re.sub(r"[^\d,]", "", s(row[2])).replace(",", ".") or "0"
-                try:
-                    remun = float(remun_txt)
-                except ValueError:
-                    remun = 0.0
+                nombre = s(row[COL_NAME])
+                remun  = clean_money(row[COL_REMUN])
 
-                cod_txt, ini_txt, fin_txt = s(row[-3]), s(row[-2]), s(row[-1])
-                cod = int(re.sub(r"[^\d]", "", cod_txt) or 0)
+                cod_txt, ini_txt, fin_txt = map(s, row[-3:])
+                cod = int(RE_ONLY_DIGITS.sub("", cod_txt) or 0)
 
-                ini = _parse_fecha(ini_txt)
-                fin = _parse_fecha(fin_txt) or ini  # si fin vacío → ini
+                ini = parse_fecha(ini_txt)
+                fin = parse_fecha(fin_txt) or ini
 
-# -------- derivar período ----------
+                # ---------- derivar período ----------
                 if ini:
-                    # tenemos Fecha Inicio  → usamos esa
-                    periodo_linea = ini.strftime("%Y%m")
-
+                    periodo = ini.strftime("%Y%m")
                 elif fin:
-                    # sólo tenemos Fecha Término → usamos esa
-                    periodo_linea = fin.strftime("%Y%m")
-
+                    periodo = fin.strftime("%Y%m")
                 elif periodo_pdf:
-                    # no hay fechas en la fila, pero sí “Período de Remuneraciones: MM/AAAA”
                     ini = fin = datetime.strptime(periodo_pdf + "01", "%Y%m%d")
-                    periodo_linea = periodo_pdf
-
+                    periodo = periodo_pdf
                 else:
-                    # sin fechas ni encabezado → fila inútil, se descarta
-                    continue
-
+                    continue  # sin fechas ni encabezado → descarta
 
                 licencias.append(
-                    {
-                        "rut": rut,
-                        "nombre": nombre,
-                        "remun": remun,
-                        "cod": cod,
-                        "inicio": ini,
-                        "fin": fin,
-                        "periodo": periodo_linea,
-                        "afp": normaliza_afp(afp_name),
-                        "src": os.path.basename(pdf_path),
-                    }
+                    dict(
+                        rut=rut,
+                        nombre=nombre,
+                        remun=remun,
+                        cod=cod,
+                        inicio=ini,
+                        fin=fin,
+                        periodo=periodo,
+                        afp=normaliza_afp(afp_name),
+                        src=os.path.basename(pdf_path),
+                    )
                 )
 
     return licencias
-
 
 # --------------------------------------------------
 # 2. PROCESAMIENTO Y REGLAS
@@ -711,6 +710,26 @@ def procesa_licencias(lic_raw: list[dict], indicadores: dict):
     lic_df = pd.DataFrame(lic_raw)
     lic_df["dias_licencia"] = (lic_df["fin"] - lic_df["inicio"]).dt.days + 1
     lic_df["periodo"] = lic_df["inicio"].dt.strftime("%Y%m")
+
+    max_rem = (
+        lic_df.groupby(["rut", "periodo"])["remun"]
+              .transform(lambda s: s[s > 0].max() if (s > 0).any() else 0)
+    )
+
+    mask_fill = (
+        (lic_df["cod"] == 3) &
+        (lic_df["remun"] == 0) &
+        (max_rem > 0)
+    )
+
+    if "comentario" not in lic_df.columns:
+        lic_df["comentario"] = ""
+
+    lic_df.loc[mask_fill, "remun"] = max_rem[mask_fill]
+    lic_df.loc[mask_fill, "comentario"] = lic_df.loc[mask_fill, "comentario"].mask(
+        lic_df.loc[mask_fill, "comentario"] == "",
+        "Remuneración copiada de otra línea (Cod. ≠ 3) del mismo período"
+    )
 
     # Indicadores
     lic_df["tope_mes"] = lic_df.apply(
