@@ -853,55 +853,66 @@ def procesa_licencias(lic_raw: list[dict], indicadores: dict):
 def main():
     """
     Flujo principal:
-        1. Lee PDFs y extrae TODAS las líneas (cód. varios)
-        2. Aplica reglas y cálculos → pagos_df (resumen) + lic_df (detalle)
-        3. Genera        pagos_corresponde.xlsx   (solo Cod. 3 aprobados)
-                        analisis_licencias_codigo3.xlsx (todos Cod. 3)
-        4. No genera TXT de justificación
+        • Extrae líneas de los PDF (todos los códigos)
+        • Aplica reglas de pago → pagos_df (resumen) y lic_df (detalle Cod. 3)
+        • Genera:
+              1) pagos_corresponde.xlsx   (solo Cod. 3 aprobados)
+              2) analisis_licencias_codigo3.xlsx (Cod. 3 completos + PDF origen)
+        • No crea TXT de justificación
     """
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
     indicadores = lee_indicadores()
 
-    licencias_totales: list[dict] = []
-    pdfs_proc: list[str] = []
+    licencias_totales, pdfs_proc = [], []
 
     print("Extrayendo licencias de PDF…")
     for file in tqdm(os.listdir(INPUT_FOLDER)):
-        if not file.lower().endswith(".pdf"):
-            continue
-        pdf_path = os.path.join(INPUT_FOLDER, file)
-        lic = extrae_licencias(pdf_path)
-        if lic:
-            licencias_totales.extend(lic)
-            pdfs_proc.append(file)
+        if file.lower().endswith(".pdf"):
+            pdf_path = os.path.join(INPUT_FOLDER, file)
+            lic = extrae_licencias(pdf_path)
+            if lic:
+                licencias_totales.extend(lic)
+                pdfs_proc.append(file)
 
     if not licencias_totales:
         print("No se extrajeron líneas de licencias en los PDF.")
         return
 
-    # Procesar reglas
+    # ---------- Procesar reglas ------------------------------------------
     pagos_df, lic_df = procesa_licencias(licencias_totales, indicadores)
 
-    # ------------------------------------------------------------
-    # Añadir nombre(s) de PDF origen a pagos_df para trazabilidad
-    # ------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # Asegurar que lic_df conserva la columna 'periodo'
+    # (puede haber sido eliminada al seleccionar columnas)
+    # ---------------------------------------------------------------------
+    if "periodo" not in lic_df.columns:
+        # Recalcular a partir de la Fecha Inicio
+        lic_df["periodo"] = pd.to_datetime(
+            lic_df["Fecha Inicio"], dayfirst=True, errors="coerce"
+        ).dt.strftime("%Y%m")
+
+    # ---------------------------------------------------------------------
+    # PDF origen → agregar a pagos_df para trazabilidad
+    # ---------------------------------------------------------------------
     archivos_grp = (
         lic_df.groupby(["RUT", "periodo"])["src"]
         .apply(lambda s: ", ".join(sorted(set(s))))
         .reset_index(name="archivos_pdf")
     )
+
     pagos_df = (
         pagos_df.merge(
             archivos_grp,
-            left_on=["RUT", "Periodo"],  # 'Periodo' ya viene renombrado en pagos_df
+            left_on=["RUT", "Periodo"],
             right_on=["RUT", "periodo"],
+            how="left",
         )
         .drop(columns=["periodo"])
     )
 
-    # ------------------------------------------------------------
-    # ①  Archivo de pagos solo Cod. 3 + aprobados
-    # ------------------------------------------------------------
+    # ---------------------------------------------------------------------
+    # ①  pagos_corresponde.xlsx  (Cod. 3 y aprobados)
+    # ---------------------------------------------------------------------
     pagos_corresponde = pagos_df[
         (pagos_df["Cod."] == 3) & (pagos_df["estado"] == "aprobado")
     ].copy()
@@ -910,10 +921,9 @@ def main():
     pagos_corresponde.to_excel(pagos_corresponde_path, index=False)
     print(f"► pagos_corresponde.xlsx generado: {pagos_corresponde_path}")
 
-    # ------------------------------------------------------------
-    # ②  Archivo de análisis completo (Cod. 3 aprobados + rechazados)
-    # ------------------------------------------------------------
-    # Orden de columnas similar al resumen, más 'archivos_pdf'
+    # ---------------------------------------------------------------------
+    # ②  analisis_licencias_codigo3.xlsx (todos Cod. 3)
+    # ---------------------------------------------------------------------
     col_order = [
         "RUT", "Nombre completo", "Remuneracion", "Cod.", "Periodo",
         "Fecha Inicio", "Fecha Término", "AFP",
