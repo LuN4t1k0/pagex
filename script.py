@@ -704,6 +704,8 @@ def procesa_licencias(lic_raw: list[dict], indicadores: dict):
     if not lic_raw:
         return pd.DataFrame(), pd.DataFrame()
 
+
+
     # ------------------------------------------------------------------
     # 2.1 Preparación DataFrame base (licencia a licencia)
     # ------------------------------------------------------------------
@@ -711,25 +713,30 @@ def procesa_licencias(lic_raw: list[dict], indicadores: dict):
     lic_df["dias_licencia"] = (lic_df["fin"] - lic_df["inicio"]).dt.days + 1
     lic_df["periodo"] = lic_df["inicio"].dt.strftime("%Y%m")
 
-    max_rem = (
-        lic_df.groupby(["rut", "periodo"])["remun"]
+    # ---------------------------------------------------------------
+    #  Rellenar remuneración de los códigos 3 con remuneración = 0
+    #  usando la remuneración >0 del mismo RUT y mismo PDF
+    # ---------------------------------------------------------------
+    max_rem_por_rut_pdf = (
+        lic_df.groupby(["rut", "src"])["remun"]
               .transform(lambda s: s[s > 0].max() if (s > 0).any() else 0)
     )
 
     mask_fill = (
         (lic_df["cod"] == 3) &
         (lic_df["remun"] == 0) &
-        (max_rem > 0)
+        (max_rem_por_rut_pdf > 0)
     )
 
     if "comentario" not in lic_df.columns:
         lic_df["comentario"] = ""
 
-    lic_df.loc[mask_fill, "remun"] = max_rem[mask_fill]
+    lic_df.loc[mask_fill, "remun"] = max_rem_por_rut_pdf[mask_fill]
     lic_df.loc[mask_fill, "comentario"] = lic_df.loc[mask_fill, "comentario"].mask(
         lic_df.loc[mask_fill, "comentario"] == "",
-        "Remuneración copiada de otra línea (Cod. ≠ 3) del mismo período"
+        "Remuneración copiada desde otra línea del mismo PDF"
     )
+
 
     # Indicadores
     lic_df["tope_mes"] = lic_df.apply(
