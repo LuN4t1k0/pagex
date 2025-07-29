@@ -40,13 +40,13 @@
 
 # NUEVO:
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import os
 from dotenv import load_dotenv
 
-from .processor import procesar_archivos
+from .processor import procesar_archivos  # función tipo generator (streaming)
 
 load_dotenv()
 
@@ -54,25 +54,17 @@ app = FastAPI(title=os.getenv("APP_NAME", "Microservicio Pagex"))
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ajustar en producción
+    allow_origins=["*"],  # ⚠️ En producción usa dominios específicos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/procesar")
-async def procesar_archivos_endpoint(
-    archivos: List[UploadFile] = File(...),
-):
+
+@app.post("/procesar", response_class=StreamingResponse)
+async def event_stream(archivos: List[UploadFile] = File(...)):
     try:
-        def event_stream():
-            for mensaje in procesar_archivos(archivos):
-                yield mensaje  # ya incluye "data: ...\n\n"
-
-        return StreamingResponse(
-            event_stream(),
-            media_type="text/event-stream"
-        )
-
+        generator = procesar_archivos(archivos)
+        return StreamingResponse(generator, media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

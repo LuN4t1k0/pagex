@@ -268,22 +268,36 @@ def get_mem_usage_mb() -> float:
     return psutil.Process(os.getpid()).memory_info().rss / 1024**2
 
 
-def chunk_files(files: List[UploadFile]) -> List[List[UploadFile]]:
+def guardar_archivos_temporales(files: List[UploadFile], destino: str) -> List[str]:
+    """
+    Guarda todos los UploadFile en el disco (en `destino`) y retorna la lista de rutas guardadas.
+    """
+    rutas = []
+    for f in files:
+        ruta = os.path.join(destino, f.filename)
+        with open(ruta, "wb") as out_file:
+            shutil.copyfileobj(f.file, out_file)
+        rutas.append(ruta)
+    return rutas
+
+
+def chunk_file_paths(file_paths: List[str]) -> List[List[str]]:
+    """
+    Divide una lista de paths de archivos en chunks según peso total y cantidad máxima por chunk.
+    """
     chunks = []
     current_chunk = []
     current_size = 0
 
-    for file in files:
-        file.file.seek(0, os.SEEK_END)
-        size = file.file.tell()
-        file.file.seek(0)
+    for path in file_paths:
+        size = os.path.getsize(path)
 
         if (current_size + size > MAX_CHUNK_BYTES or len(current_chunk) >= MAX_FILES_PER_CHUNK) and current_chunk:
             chunks.append(current_chunk)
-            current_chunk = [file]
+            current_chunk = [path]
             current_size = size
         else:
-            current_chunk.append(file)
+            current_chunk.append(path)
             current_size += size
 
     if current_chunk:
@@ -306,9 +320,12 @@ def procesar_archivos(files: List[UploadFile], indicadores_path: str | None = No
         result_dir = os.path.join(tmpdir, "result")
         os.makedirs(pdf_dir), os.makedirs(result_dir)
 
+        # Guardar archivos en disco
         yield f"data: 📦 Total de archivos: {len(files)}\n\n"
+        file_paths = guardar_archivos_temporales(files, pdf_dir)
 
-        chunks = chunk_files(files)
+        # Chunkear archivos en disco
+        chunks = chunk_file_paths(file_paths)
         yield f"data: 🔀 Divididos en {len(chunks)} chunks de máximo {MAX_CHUNK_MB}MB o {MAX_FILES_PER_CHUNK} archivos\n\n"
 
         licencias_totales = []
@@ -317,19 +334,13 @@ def procesar_archivos(files: List[UploadFile], indicadores_path: str | None = No
             yield f"data: 🚀 Procesando chunk {idx+1}/{len(chunks)} ({len(chunk)} archivos)\n\n"
             chunk_size_mb = 0
 
-            for i, f in enumerate(chunk):
-                dst = os.path.join(pdf_dir, f.filename)
-                with open(dst, "wb") as out:
-                    shutil.copyfileobj(f.file, out)
-
-                f.file.seek(0, os.SEEK_END)
-                size_mb = f.file.tell() / 1024 / 1024
-                f.file.seek(0)
+            for i, path in enumerate(chunk):
+                size_mb = os.path.getsize(path) / 1024 / 1024
                 chunk_size_mb += size_mb
 
-                yield f"data:   📄 [{i+1}/{len(chunk)}] {f.filename} ({size_mb:.2f} MB)\n\n"
+                yield f"data:   📄 [{i+1}/{len(chunk)}] {os.path.basename(path)} ({size_mb:.2f} MB)\n\n"
 
-                licencias = extrae_licencias(dst)
+                licencias = extrae_licencias(path)
                 licencias_totales.extend(licencias)
 
             yield f"data: 📁 Chunk {idx+1} → peso: {chunk_size_mb:.2f} MB\n\n"
@@ -349,11 +360,6 @@ def procesar_archivos(files: List[UploadFile], indicadores_path: str | None = No
 
         pagos_df.to_excel(summary_path, index=False)
         lic_df.to_excel(analisis_path, index=False)
-
-        final_info = {
-            "summary": SUMMARY_NAME,
-            "analisis": ANALISIS_NAME,
-        }
 
         yield f"data: ✅ Archivos generados\n\n"
         yield f"data: 📄 Resumen: {SUMMARY_NAME}\n\n"
