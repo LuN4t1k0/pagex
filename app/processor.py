@@ -237,14 +237,12 @@ from tempfile import TemporaryDirectory
 from typing import List, Generator
 
 import pandas as pd
-from fastapi import UploadFile
 from dotenv import load_dotenv
 
 from script import extrae_licencias, procesa_licencias
 
 load_dotenv()
 
-# Configuración
 MAX_CHUNK_MB = 5
 MAX_CHUNK_BYTES = MAX_CHUNK_MB * 1024 * 1024
 MAX_FILES_PER_CHUNK = 30
@@ -268,22 +266,17 @@ def get_mem_usage_mb() -> float:
     return psutil.Process(os.getpid()).memory_info().rss / 1024**2
 
 
-def guardar_archivos_temporales(files: List[UploadFile], destino: str) -> List[str]:
+def guardar_archivos_temporales(files: List[tuple[str, bytes]], destino: str) -> List[str]:
     rutas = []
-    for f in files:
-        ruta = os.path.join(destino, f.filename)
+    for filename, content in files:
+        ruta = os.path.join(destino, filename)
         with open(ruta, "wb") as out_file:
-            content = f.file.read()
             out_file.write(content)
-        f.file.close()
         rutas.append(ruta)
     return rutas
 
 
 def chunk_file_paths(file_paths: List[str]) -> List[List[str]]:
-    """
-    Divide una lista de paths de archivos en chunks según peso total y cantidad máxima por chunk.
-    """
     chunks = []
     current_chunk = []
     current_size = 0
@@ -305,7 +298,7 @@ def chunk_file_paths(file_paths: List[str]) -> List[List[str]]:
     return chunks
 
 
-def procesar_archivos(files: List[UploadFile], indicadores_path: str | None = None) -> Generator[str, None, None]:
+def procesar_archivos(files: List[tuple[str, bytes]], indicadores_path: str | None = None) -> Generator[str, None, None]:
     ts = datetime.now().strftime("%Y%m%d_%H%M")
 
     if not indicadores_path:
@@ -319,11 +312,9 @@ def procesar_archivos(files: List[UploadFile], indicadores_path: str | None = No
         result_dir = os.path.join(tmpdir, "result")
         os.makedirs(pdf_dir), os.makedirs(result_dir)
 
-        # Guardar archivos en disco
         yield f"data: 📦 Total de archivos: {len(files)}\n\n"
         file_paths = guardar_archivos_temporales(files, pdf_dir)
 
-        # Chunkear archivos en disco
         chunks = chunk_file_paths(file_paths)
         yield f"data: 🔀 Divididos en {len(chunks)} chunks de máximo {MAX_CHUNK_MB}MB o {MAX_FILES_PER_CHUNK} archivos\n\n"
 

@@ -60,11 +60,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.post("/procesar", response_class=StreamingResponse)
 async def event_stream(archivos: List[UploadFile] = File(...)):
     try:
-        generator = procesar_archivos(archivos)
+        archivos_leidos = [(f.filename, await f.read()) for f in archivos]  # 🔥 lectura temprana
+        generator = procesar_archivos(archivos_leidos)
         return StreamingResponse(generator, media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
