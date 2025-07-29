@@ -9,8 +9,8 @@ EXTENSIONES_VALIDAS = [
 
 EXCLUIR_ARCHIVOS = ['poetry.lock', 'Pipfile.lock']
 EXCLUIR_CARPETAS = [
-    '.git', '.venv', '__pycache__', 'logs', 'migrations',
-    '.vscode', '.idea', 'dist', 'build', '.export'
+    '.git', '.venv', 'venv', '__pycache__', 'logs', 'migrations',
+    '.vscode', '.idea', 'dist', 'build', '.export', '.pytest_cache'
 ]
 
 # Ruta raíz del proyecto
@@ -22,8 +22,12 @@ ruta_salida = os.path.join(carpeta_export, 'contexto_ia_fastapi.txt')
 os.makedirs(carpeta_export, exist_ok=True)
 
 # ========== FUNCIONES ==========
+def carpeta_excluida(ruta):
+    partes = Path(ruta).parts
+    return any(excluida in partes for excluida in EXCLUIR_CARPETAS)
+
 def es_archivo_valido(ruta):
-    if any(parte in EXCLUIR_CARPETAS for parte in Path(ruta).parts):
+    if carpeta_excluida(ruta):
         return False
     if os.path.basename(ruta) in EXCLUIR_ARCHIVOS:
         return False
@@ -33,15 +37,11 @@ def es_archivo_valido(ruta):
         return False
     return True
 
-
 def obtener_ruta_relativa(ruta_absoluta):
     return os.path.relpath(ruta_absoluta, directorio_raiz)
 
-
 def limpiar_comentarios_y_lineas(contenido, extension):
-    # 1. Eliminar comentarios
     if extension == '.py':
-        # Comentarios de bloque (""" o ''') y de línea (#)
         contenido = re.sub(r'"""[\s\S]*?"""', '', contenido)
         contenido = re.sub(r"'''[\s\S]*?'''", '', contenido)
         contenido = re.sub(r'^\s*#.*$', '', contenido, flags=re.MULTILINE)
@@ -50,7 +50,6 @@ def limpiar_comentarios_y_lineas(contenido, extension):
     elif extension in ['.yml', '.yaml']:
         contenido = re.sub(r'^\s*#.*$', '', contenido, flags=re.MULTILINE)
 
-    # 2. Eliminar líneas vacías consecutivas
     lineas = contenido.splitlines()
     nuevas_lineas = []
     salto = False
@@ -71,7 +70,9 @@ with open(ruta_salida, 'w', encoding='utf-8') as salida:
     salida.write("# Proyecto basado en Python, FastAPI, SQLAlchemy, PostgreSQL\n\n")
 
     for carpeta_actual, subcarpetas, archivos in os.walk(directorio_raiz):
+        # Filtrar subcarpetas in-place para que os.walk no entre en ellas
         subcarpetas[:] = [d for d in subcarpetas if d not in EXCLUIR_CARPETAS]
+
         for archivo in archivos:
             ruta_completa = os.path.join(carpeta_actual, archivo)
             if es_archivo_valido(ruta_completa):
