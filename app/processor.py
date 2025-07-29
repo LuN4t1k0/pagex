@@ -235,6 +235,8 @@ import psutil
 from datetime import datetime
 from tempfile import TemporaryDirectory
 from typing import List, Generator
+import sys
+import pickle
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -333,6 +335,12 @@ def procesar_archivos(files: List[tuple[str, bytes]], indicadores_path: str | No
                 licencias = extrae_licencias(path)
                 licencias_totales.extend(licencias)
 
+                yield f"data: 📦 Licencias acumuladas: {len(licencias_totales)}\n\n"
+
+            # Medimos tamaño en memoria
+            size_licencias = sys.getsizeof(pickle.dumps(licencias_totales)) / 1024 / 1024
+            yield f"data: 🧠 Memoria usada por licencias_totales: {size_licencias:.2f} MB\n\n"
+
             yield f"data: 📁 Chunk {idx+1} → peso: {chunk_size_mb:.2f} MB\n\n"
             yield f"data: 🧠 RAM usada: {get_mem_usage_mb():.2f} MB\n\n"
             gc.collect()
@@ -343,6 +351,12 @@ def procesar_archivos(files: List[tuple[str, bytes]], indicadores_path: str | No
 
         yield "data: 📊 Aplicando reglas y generando archivos Excel...\n\n"
         pagos_df, lic_df = procesa_licencias(licencias_totales, indicadores)
+
+        size_pagos = sys.getsizeof(pickle.dumps(pagos_df)) / 1024 / 1024
+        size_lic = sys.getsizeof(pickle.dumps(lic_df)) / 1024 / 1024
+        yield f"data: 🧠 Memoria usada por pagos_df: {size_pagos:.2f} MB\n\n"
+        yield f"data: 🧠 Memoria usada por lic_df  : {size_lic:.2f} MB\n\n"
+
         pagos_df = _force_numeric(pagos_df)
 
         summary_path = os.path.join(result_dir, SUMMARY_NAME)
