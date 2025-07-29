@@ -269,14 +269,13 @@ def get_mem_usage_mb() -> float:
 
 
 def guardar_archivos_temporales(files: List[UploadFile], destino: str) -> List[str]:
-    """
-    Guarda todos los UploadFile en el disco (en `destino`) y retorna la lista de rutas guardadas.
-    """
     rutas = []
     for f in files:
         ruta = os.path.join(destino, f.filename)
         with open(ruta, "wb") as out_file:
-            shutil.copyfileobj(f.file, out_file)
+            content = f.file.read()
+            out_file.write(content)
+        f.file.close()
         rutas.append(ruta)
     return rutas
 
